@@ -1,5 +1,121 @@
 defmodule Cabbage.Feature do
   @moduledoc """
+  An extension on ExUnit to be able to execute feature files.
+
+  ## Configuration
+
+  In `config/test.exs`
+
+      config :cabbage,
+        # Default is "test/features/"
+        features: "my/path/to/features/"
+
+  Allows you to specify the location of your feature files. They can be anywhere, but typically are located within the test folder.
+
+  ## Features
+
+  Given a feature file, create a corresponding feature module which references it. Heres an example:
+
+      defmodule MyApp.SomeFeatureTest do
+        use Cabbage.Feature, file: "some_feature.feature"
+
+        defgiven ~r/I am given a given statement/, _matched_data, _current_state do
+          assert 1 + 1 == 2
+          {:ok, %{new: :state}}
+        end
+
+        defwhen ~r/I when execute it/, _matched_data, _current_state do
+          # Nothing to do, don't need to return anything if we don't want to
+          nil
+        end
+
+        defthen ~r/everything is ok/, _matched_data, _current_state do
+          assert true
+        end
+      end
+
+  This translates loosely into:
+
+      defmodule MyApp.SomeFeatureTest do
+        use ExUnit.Case
+
+        test "The name of the scenario here" do
+          assert 1 + 1 == 2
+          nil
+          assert true
+        end
+      end
+
+  ### Extracting Matched Data
+
+  You'll likely have data within your feature statements which you want to extract. The second parameter to each of `defgiven/4`, `defwhen/4`, `defthen/4` and `defand/4` is a pattern in which specifies what you want to call the matched data, provided as a map.
+
+  For example, if you want to match on a number:
+
+      # NOTICE THE `number` VARIABLE IS STILL A STRING!!
+      defgiven ~r/^there (is|are) (?<number>\d+) widget(s?)$/, %{number: number}, _state do
+        assert String.to_integer(number) >= 1
+      end
+
+  For every named capture, you'll have a key as an atom in the second parameter. You can then use those variables you create within your block.
+
+  ### Modifying State
+
+  You'll likely have to keep track of some state in between statements. The third parameter to each of `defgiven/4`, `defwhen/4`, `defthen/4` and `defand/4` is a pattern in which specifies what you want to call your state in the same way that the `ExUnit.Case.test/3` macro works.
+
+  You can setup initial state using plain ExUnit `setup/1` and `setup_all/1`. Whatever state is provided via the `test/3` macro will be your initial state.
+
+  To update the state, simply return `{:ok, %{new: :state}}`. Note that a `Map.merge/2` will be performed for you so only have to specify the keys you want to update. For this reason, only a map is allowed as state.
+
+  Heres an example modifying state:
+
+      defand ~r/^I am an admin$/, _, %{user: user} do
+        {:ok, %{user: User.promote_to_admin(user)}}
+      end
+
+  All other statements do not need to return (and should be careful not to!) the `{:ok, state}` pattern.
+
+  ### Organizing Features
+
+  You may want to reuse several statements you create, especially ones that deal with global logic like users and logging in.
+
+  Feature modules can be created without referencing a file. This makes them do nothing except hold translations between steps in a scenario and test code to be included into a test. These modules must be compiled prior to running the test suite, so for that reason you must add them to the `elixirc_paths` in your `mix.exs` file, like so:
+
+      defmodule MyApp.Mixfile do
+        use Mix.Project
+
+        def project do
+          [
+            app: :my_app,
+            ... # Add this to your project function
+            elixirc_paths: elixirc_paths(Mix.env),
+            ...
+          ]
+        end
+
+        # Specifies which paths to compile per environment.
+        defp elixirc_paths(:test), do: ["lib", "test/support"]
+        defp elixirc_paths(_),     do: ["lib"]
+
+        ...
+      end
+
+  If you're using Phoenix, this should already be setup for you. Simply place a file like the following into `test/support`.
+
+      defmodule MyApp.GlobalFeatures do
+        use Cabbage.Feature
+
+        # Write your `defgiven/4`, `defthen/4`, `defwhen/4` and `defand/4`s here
+      end
+
+  Then inside the test file (the .exs one) add a `import_feature MyApp.GlobalFeatures` line after the `use Cabbage.Feature` line lke so:
+
+      defmodule MyApp.SomeFeatureTest do
+        use Cabbage.Feature, file: "some_feature.feature"
+        import_feature MyApp.GlobalFeatures
+
+        # Omitted the rest
+      end
   """
 
   @feature_opts [:file]
@@ -21,7 +137,7 @@ defmodule Cabbage.Feature do
 
       unquote(if is_feature do
         quote do
-          @feature File.read!("#{Cabbage.base_path}#{unquote(opts[:file])}") |> Gherkin.Parser.parse_feature()
+          @feature File.read!("#{Cabbage.base_path}#{unquote(opts[:file])}") |> Gherkin.parse()
           @scenarios @feature.scenarios
         end
       end)
