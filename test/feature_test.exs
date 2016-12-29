@@ -3,6 +3,8 @@ defmodule Cabbage.FeatureTest do
   alias Gherkin.Elements.Scenario
   doctest Cabbage.Feature
 
+  import_feature Cabbage.GlobalFeatures
+
   test "has an @feature" do
     assert "Serve coffee" = @feature.name
     assert %Scenario{steps: [_ | _]} = @feature.scenarios |> hd()
@@ -10,14 +12,6 @@ defmodule Cabbage.FeatureTest do
 
   setup do
     {:ok, %{starting: :state}}
-  end
-
-  defgiven ~r/^there are (?<number>\d+) coffees left in the machine$/, %{number: number}, %{starting: :state} do
-    {:ok, %{coffees: String.to_integer(number)}}
-  end
-
-  defand ~r/^I have deposited \$(?<money>\d+)$/, %{money: money}, %{coffees: _coffees} do
-    {:ok, %{deposited: String.to_integer(money)}}
   end
 
   defwhen ~r/^I press the coffee button$/, _, %{deposited: deposited} do

@@ -1,0 +1,1 @@
+%{"gherkin": {:git, "https://github.com/mgwidmann/gherkin.git", "c97d2f0dece2134b183a1363be165d1a6224734d", []}}

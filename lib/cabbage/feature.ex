@@ -1,27 +1,45 @@
 defmodule Cabbage.Feature do
   @moduledoc """
   """
-  alias Gherkin.Elements.Scenario
 
   @feature_opts [:file]
   defmacro __using__(opts) do
     {opts, exunit_opts} = Keyword.split(opts, @feature_opts)
+    is_feature = !match?(nil, opts[:file])
     quote location: :keep do
-      @before_compile unquote(__MODULE__)
-      use ExUnit.Case, unquote(exunit_opts)
+      unquote(if is_feature do
+        quote do
+          @before_compile unquote(__MODULE__)
+          use ExUnit.Case, unquote(exunit_opts)
+        end
+      end)
+      @before_compile {unquote(__MODULE__), :expose_steps}
       import unquote(__MODULE__)
       require Logger
 
       Module.register_attribute(__MODULE__, :steps, accumulate: true)
 
-      @feature File.read!("#{Cabbage.base_path}#{unquote(opts[:file])}") |> Gherkin.Parser.parse_feature()
-      @scenarios @feature.scenarios
+      unquote(if is_feature do
+        quote do
+          @feature File.read!("#{Cabbage.base_path}#{unquote(opts[:file])}") |> Gherkin.Parser.parse_feature()
+          @scenarios @feature.scenarios
+        end
+      end)
+    end
+  end
+
+  defmacro expose_steps(env) do
+    steps = Module.get_attribute(env.module, :steps)
+    quote generated: true do
+      def raw_steps() do
+        unquote(Macro.escape(steps))
+      end
     end
   end
 
   defmacro __before_compile__(env) do
-    scenarios = Module.get_attribute(env.module, :scenarios)
-    steps = Module.get_attribute(env.module, :steps)
+    scenarios = Module.get_attribute(env.module, :scenarios) || []
+    steps = Module.get_attribute(env.module, :steps) || []
     for scenario <- scenarios do
       quote location: :keep, generated: true do
         @tag :integration
@@ -36,8 +54,9 @@ defmodule Cabbage.Feature do
 
   def execute(step, steps, scenario_name) when is_list(steps) do
     step_type = Module.split(step.__struct__) |> List.last()
-    case Enum.find(steps, fn ({r, _, _, _}) -> step.text =~ r end) do
-      {regex, vars, state_pattern, block} ->
+    case Enum.find(steps, fn ({:{}, _, [r, _, _, _]}) -> step.text =~ Code.eval_quoted(r) |> elem(0) end) do
+      {:{}, _, [regex, vars, state_pattern, block]} ->
+        {regex, _} = Code.eval_quoted(regex)
         named_vars = for {key, val} <- Regex.named_captures(regex, step.text), into: %{}, do: {String.to_atom(key), val}
         quote location: :keep, generated: true do
           state = Agent.get(unquote(agent_name(scenario_name)), &(&1))
@@ -63,6 +82,16 @@ defmodule Cabbage.Feature do
     end
   end
 
+  defmacro import_feature(module) do
+    quote do
+      if Code.ensure_compiled?(unquote(module)) do
+        for step <- unquote(module).raw_steps() do
+          Module.put_attribute(__MODULE__, :steps, step)
+        end
+      end
+    end
+  end
+
   defmacro defgiven(regex, vars, state, [do: block]) do
     add_step(__CALLER__.module, regex, vars, state, block)
   end
@@ -80,9 +109,8 @@ defmodule Cabbage.Feature do
   end
 
   defp add_step(module, regex, vars, state, block) do
-    steps = Module.get_attribute(module, :steps)
-    {regex, _} = Code.eval_quoted(regex)
-    Module.put_attribute(module, :steps, [{regex, vars, state, block} | steps])
+    steps = Module.get_attribute(module, :steps) || []
+    Module.put_attribute(module, :steps, [{:{}, [], [regex, vars, state, block]} | steps])
     quote(do: nil)
   end
 
