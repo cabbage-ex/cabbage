@@ -12,7 +12,7 @@ defmodule Cabbage.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      description: "",
+      description: "Story BDD tool for executing elixir in ExUnit",
       docs: [
         main: Gherkin,
         readme: "README.md"
