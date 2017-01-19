@@ -1,14 +1,26 @@
 defmodule Cabbage.Mixfile do
   use Mix.Project
 
+  @version "0.1.0"
   def project do
-    [app: :cabbage,
-     version: "0.1.0",
-     elixir: "~> 1.3",
-     elixirc_paths: elixirc_paths(Mix.env),
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      app: :cabbage,
+      version: @version,
+      elixir: "~> 1.2",
+      source_url: "git@github.com:cabbage-ex/cabbage.git",
+      homepage_url: "https://github.com/cabbage-ex/cabbage",
+      elixirc_paths: elixirc_paths(Mix.env),
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      description: "",
+      docs: [
+        main: Gherkin,
+        readme: "README.md"
+      ],
+      package: package(),
+      deps: deps(),
+      aliases: aliases()
+    ]
   end
 
   # Configuration for the OTP application
@@ -33,7 +45,28 @@ defmodule Cabbage.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:gherkin, "~> 0.1.0", github: "mgwidmann/gherkin"}
+      {:gherkin, "~> 1.0"},
+      {:ex_doc, "~> 0.10", only: :dev},
+      {:earmark, "~> 0.1", only: :dev}
     ]
+  end
+
+  defp package do
+    [
+      maintainers: ["Matt Widmann", "Steve B"],
+      licenses: ["MIT"],
+      links: %{github: "https://github.com/cabbage-ex/cabbage"}
+    ]
+  end
+
+  defp aliases do
+    [publish: ["hex.publish", "hex.publish docs", "tag"],
+     tag: &tag_release/1]
+  end
+
+  defp tag_release(_) do
+    Mix.shell.info "Tagging release as #{@version}"
+    System.cmd("git", ["tag", "-a", "v#{@version}", "-m", "v#{@version}"])
+    System.cmd("git", ["push", "--tags"])
   end
 end
