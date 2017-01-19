@@ -14,7 +14,7 @@ defmodule Cabbage.Mixfile do
       start_permanent: Mix.env == :prod,
       description: "Story BDD tool for executing elixir in ExUnit",
       docs: [
-        main: Gherkin,
+        main: Cabbage,
         readme: "README.md"
       ],
       package: package(),
