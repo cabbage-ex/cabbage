@@ -51,7 +51,7 @@ defmodule MyApp.Features.CoffeeTest do
   end
 
   # All `defgiven/4`, `defand/4`, `defwhen/4` and `defthen/4` takes a regex, matched data, state and lastly a block
-  defgiven ~r/^there (is|are) (?<number>\d+) coffee(s) left in the machine$/, %{number: number}, %{user: user} do
+  defgiven ~r/^there (is|are) (?<number>\d+) coffee(s) left in the machine$/, %{user: user}, %{number: number} do
     # `{:ok, state}` gets returned from each callback which updates the state or
     # leaves the state unchanged when something else is returned
     {:ok, %{machine: Machine.put_coffee(Machine.new, number)}}
