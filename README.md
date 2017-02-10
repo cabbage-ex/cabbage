@@ -4,9 +4,11 @@
 
 A simple addon on top of [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) which provides compile time translation of `.feature` files to exunit tests. Big thanks to [@meadsteve](https://github.com/meadsteve) and the [White Bread](https://github.com/meadsteve/white-bread) project for a huge head start on this project.
 
+## NOTE: Basic features are available, but project is still under development!
+
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+[Available in Hex](https://hex.pm/packages/cabbage), the package can be installed as:
 
   1. Add `cabbage` to your list of dependencies in `mix.exs`:
 
@@ -102,3 +104,9 @@ end
 ```
 
 This provides the best of both worlds. Feature files for non-technical users, and an actual test file written in Elixir for developers that have to maintain them.
+
+# Roadmap
+
+- [ ] Scenario Outlines
+- [ ] Integration Helpers for Wallaby (separate project?)
+- [ ] Integration Helpers for Hound (separate project?)
