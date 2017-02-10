@@ -117,12 +117,13 @@ defmodule Cabbage.Feature do
         # Omitted the rest
       end
   """
+  import Cabbage.Feature.Helpers
 
   @feature_opts [:file]
   defmacro __using__(opts) do
     {opts, exunit_opts} = Keyword.split(opts, @feature_opts)
     is_feature = !match?(nil, opts[:file])
-    quote location: :keep do
+    quote do
       unquote(if is_feature do
         quote do
           @before_compile unquote(__MODULE__)
@@ -137,7 +138,7 @@ defmodule Cabbage.Feature do
 
       unquote(if is_feature do
         quote do
-          @feature File.read!("#{Cabbage.base_path}#{unquote(opts[:file])}") |> Gherkin.parse()
+          @feature File.read!("#{Cabbage.base_path}#{unquote(opts[:file])}") |> Gherkin.parse() |> Gherkin.flatten()
           @scenarios @feature.scenarios
         end
       end)
@@ -157,45 +158,56 @@ defmodule Cabbage.Feature do
     scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
     for scenario <- scenarios do
-      quote location: :keep, generated: true do
+      quote generated: true do
         @tag :integration
         test unquote(scenario.name), exunit_state do
           Agent.start(fn -> exunit_state end, name: unquote(agent_name(scenario.name)))
           Logger.info ["\t", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
-          unquote Enum.map(scenario.steps, &execute(&1, steps, scenario.name))
+          unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))
         end
       end
     end
   end
 
-  def execute(step, steps, scenario_name) when is_list(steps) do
-    step_type = Module.split(step.__struct__) |> List.last()
-    case Enum.find(steps, fn ({:{}, _, [r, _, _, _]}) -> step.text =~ Code.eval_quoted(r) |> elem(0) end) do
-      {:{}, _, [regex, vars, state_pattern, block]} ->
-        {regex, _} = Code.eval_quoted(regex)
-        named_vars = for {key, val} <- Regex.named_captures(regex, step.text), into: %{}, do: {String.to_atom(key), val}
-        quote location: :keep, generated: true do
-          state = Agent.get(unquote(agent_name(scenario_name)), &(&1))
-          unquote(vars) = unquote(Macro.escape(named_vars))
-          unquote(state_pattern) = state
-          new_state = case unquote(block) do
-                        {:ok, new_state} -> Map.merge(new_state, state)
-                        _ -> state
-                      end
-          Agent.update(unquote(agent_name(scenario_name)), fn(_) -> new_state end)
-          Logger.info ["\t\t", IO.ANSI.cyan, unquote(step_type), " ", IO.ANSI.green, unquote(step.text)]
-        end
-      _ ->
-        raise """
+  def compile_step(step, steps, scenario_name) when is_list(steps) do
+    steps
+    |> Enum.find(fn ({:{}, _, [r, _, _, _, _]}) -> step.text =~ Code.eval_quoted(r) |> elem(0) end)
+    |> compile(step, Module.split(step.__struct__) |> List.last(), scenario_name)
+  end
 
-        Please add a matching step for:
-        "#{step_type} #{step.text}"
-
-          def#{step_type |> String.downcase} ~r/^#{step.text}$/, vars, state do
-            # Your implementation here
-          end
-        """
+  defp compile({:{}, _, [regex, vars, state_pattern, block, metadata]}, step, step_type, scenario_name) do
+    {regex, _} = Code.eval_quoted(regex)
+    named_vars = for {key, val} <- Regex.named_captures(regex, step.text), into: %{}, do: {String.to_atom(key), val}
+    quote generated: true do
+      with {_type, unquote(vars)} <- {:variables, unquote(Macro.escape(named_vars))},
+           {_type, state = unquote(state_pattern)} <- {:state, Agent.get(unquote(agent_name(scenario_name)), &(&1))}
+           do
+        new_state = case unquote(block) do
+                     {:ok, new_state} -> Map.merge(new_state, state)
+                     _ -> state
+                   end
+        Agent.update(unquote(agent_name(scenario_name)), fn(_) -> new_state end)
+        Logger.info ["\t\t", IO.ANSI.cyan, unquote(step_type), " ", IO.ANSI.green, unquote(step.text)]
+      else
+        {type, state} ->
+          metadata = unquote(Macro.escape(metadata))
+          reraise """
+          ** (MatchError) Failure to match #{type} of #{inspect Cabbage.Feature.Helpers.remove_hidden_state(state)}
+          """, Cabbage.Feature.Helpers.stacktrace(__MODULE__, metadata)
+      end
     end
+  end
+
+  defp compile(_, step, step_type, _scenario_name) do
+    raise """
+
+    Please add a matching step for:
+    "#{step_type} #{step.text}"
+
+      def#{step_type |> String.downcase} ~r/^#{step.text}$/, vars, state do
+        # Your implementation here
+      end
+    """
   end
 
   defmacro import_feature(module) do
@@ -208,29 +220,20 @@ defmodule Cabbage.Feature do
     end
   end
 
+
   defmacro defgiven(regex, vars, state, [do: block]) do
-    add_step(__CALLER__.module, regex, vars, state, block)
+    add_step(__CALLER__.module, regex, vars, state, block, metadata(__CALLER__, :defgiven))
   end
 
   defmacro defand(regex, vars, state, [do: block]) do
-    add_step(__CALLER__.module, regex, vars, state, block)
+    add_step(__CALLER__.module, regex, vars, state, block, metadata(__CALLER__, :defand))
   end
 
   defmacro defwhen(regex, vars, state, [do: block]) do
-    add_step(__CALLER__.module, regex, vars, state, block)
+    add_step(__CALLER__.module, regex, vars, state, block, metadata(__CALLER__, :defwhen))
   end
 
   defmacro defthen(regex, vars, state, [do: block]) do
-    add_step(__CALLER__.module, regex, vars, state, block)
-  end
-
-  defp add_step(module, regex, vars, state, block) do
-    steps = Module.get_attribute(module, :steps) || []
-    Module.put_attribute(module, :steps, [{:{}, [], [regex, vars, state, block]} | steps])
-    quote(do: nil)
-  end
-
-  defp agent_name(scenario_name) do
-    :"cabbage_integration_test-#{scenario_name}"
+    add_step(__CALLER__.module, regex, vars, state, block, metadata(__CALLER__, :defthen))
   end
 end
