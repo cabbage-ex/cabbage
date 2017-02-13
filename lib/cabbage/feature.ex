@@ -169,19 +169,28 @@ defmodule Cabbage.Feature do
   end
 
   def execute(step, steps, scenario_name) when is_list(steps) do
-    step_type = Module.split(step.__struct__) |> List.last()
-    case Enum.find(steps, fn ({:{}, _, [r, _, _, _]}) -> step.text =~ Code.eval_quoted(r) |> elem(0) end) do
+    step_type =
+      step.__struct__
+      |> Module.split()
+      |> List.last()
+
+    case find_implementation_of_step(step, steps) do
       {:{}, _, [regex, vars, state_pattern, block]} ->
         {regex, _} = Code.eval_quoted(regex)
-        named_vars = for {key, val} <- Regex.named_captures(regex, step.text), into: %{}, do: {String.to_atom(key), val}
+
+        named_vars = extract_named_vars(regex, step.text)
+
         quote location: :keep, generated: true do
           state = Agent.get(unquote(agent_name(scenario_name)), &(&1))
           unquote(vars) = unquote(Macro.escape(named_vars))
           unquote(state_pattern) = state
-          new_state = case unquote(block) do
-                        {:ok, new_state} -> Map.merge(new_state, state)
-                        _ -> state
-                      end
+
+          new_state =
+            case unquote(block) do
+              {:ok, new_state} -> Map.merge(new_state, state)
+              _ -> state
+            end
+
           Agent.update(unquote(agent_name(scenario_name)), fn(_) -> new_state end)
           Logger.info ["\t\t", IO.ANSI.cyan, unquote(step_type), " ", IO.ANSI.green, unquote(step.text)]
         end
@@ -196,6 +205,19 @@ defmodule Cabbage.Feature do
           end
         """
     end
+  end
+
+  defp find_implementation_of_step(step, steps) do
+    Enum.find(steps, fn ({:{}, _, [r, _, _, _]}) ->
+      step.text =~ r |> Code.eval_quoted() |> elem(0)
+    end)
+  end
+
+  defp extract_named_vars(regex, step_text) do
+    regex
+    |> Regex.named_captures(step_text)
+    |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
+    |> Enum.into(%{})
   end
 
   defmacro import_feature(module) do
