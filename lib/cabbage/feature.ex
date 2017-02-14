@@ -119,7 +119,7 @@ defmodule Cabbage.Feature do
   """
   import Cabbage.Feature.Helpers
 
-  @feature_opts [:file]
+  @feature_opts [:file, :template]
   defmacro __using__(opts) do
     {opts, exunit_opts} = Keyword.split(opts, @feature_opts)
     is_feature = !match?(nil, opts[:file])
@@ -127,7 +127,7 @@ defmodule Cabbage.Feature do
       unquote(if is_feature do
         quote do
           @before_compile unquote(__MODULE__)
-          use ExUnit.Case, unquote(exunit_opts)
+          use unquote(opts[:template] || ExUnit.Case), unquote(exunit_opts)
         end
       end)
       @before_compile {unquote(__MODULE__), :expose_steps}
@@ -161,7 +161,7 @@ defmodule Cabbage.Feature do
       quote generated: true do
         @tag :integration
         test unquote(scenario.name), exunit_state do
-          Agent.start(fn -> exunit_state end, name: unquote(agent_name(scenario.name)))
+          Agent.start(fn -> exunit_state end, name: unquote(agent_name(scenario.name, env.module)))
           Logger.info ["\t", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
           unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))
         end
@@ -185,19 +185,20 @@ defmodule Cabbage.Feature do
     named_vars = extract_named_vars(regex, step.text)
     quote generated: true do
       with {_type, unquote(vars)} <- {:variables, unquote(Macro.escape(named_vars))},
-           {_type, state = unquote(state_pattern)} <- {:state, Agent.get(unquote(agent_name(scenario_name)), &(&1))}
+           {_type, state = unquote(state_pattern)} <- {:state, Cabbage.Feature.Helpers.fetch_state(unquote(scenario_name), __MODULE__)}
            do
         new_state = case unquote(block) do
                      {:ok, new_state} -> Map.merge(new_state, state)
                      _ -> state
                    end
-        Agent.update(unquote(agent_name(scenario_name)), fn(_) -> new_state end)
+        Cabbage.Feature.Helpers.update_state(unquote(scenario_name), __MODULE__, fn(_) -> new_state end)
         Logger.info ["\t\t", IO.ANSI.cyan, unquote(step_type), " ", IO.ANSI.green, unquote(step.text)]
       else
         {type, state} ->
           metadata = unquote(Macro.escape(metadata))
           reraise """
           ** (MatchError) Failure to match #{type} of #{inspect Cabbage.Feature.Helpers.remove_hidden_state(state)}
+          Pattern: #{unquote(Macro.to_string(state_pattern))}
           """, Cabbage.Feature.Helpers.stacktrace(__MODULE__, metadata)
       end
     end
