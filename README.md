@@ -110,6 +110,7 @@ This provides the best of both worlds. Feature files for non-technical users, an
 
 - [x] Scenarios
 - [x] Scenario Outlines
+- [ ] ExUnit Case Templates
 - [ ] Tags implementation
 - [ ] Integration Helpers for Wallaby (separate project?)
 - [ ] Integration Helpers for Hound (separate project?)
