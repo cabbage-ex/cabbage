@@ -170,14 +170,19 @@ defmodule Cabbage.Feature do
   end
 
   def compile_step(step, steps, scenario_name) when is_list(steps) do
-    steps
-    |> Enum.find(fn ({:{}, _, [r, _, _, _, _]}) -> step.text =~ Code.eval_quoted(r) |> elem(0) end)
-    |> compile(step, Module.split(step.__struct__) |> List.last(), scenario_name)
+    step_type =
+      step.__struct__
+      |> Module.split()
+      |> List.last()
+
+    step
+    |> find_implementation_of_step(steps)
+    |> compile(step, step_type, scenario_name)
   end
 
   defp compile({:{}, _, [regex, vars, state_pattern, block, metadata]}, step, step_type, scenario_name) do
     {regex, _} = Code.eval_quoted(regex)
-    named_vars = for {key, val} <- Regex.named_captures(regex, step.text), into: %{}, do: {String.to_atom(key), val}
+    named_vars = extract_named_vars(regex, step.text)
     quote generated: true do
       with {_type, unquote(vars)} <- {:variables, unquote(Macro.escape(named_vars))},
            {_type, state = unquote(state_pattern)} <- {:state, Agent.get(unquote(agent_name(scenario_name)), &(&1))}
@@ -200,7 +205,6 @@ defmodule Cabbage.Feature do
 
   defp compile(_, step, step_type, _scenario_name) do
     raise """
-
     Please add a matching step for:
     "#{step_type} #{step.text}"
 
@@ -208,6 +212,19 @@ defmodule Cabbage.Feature do
         # Your implementation here
       end
     """
+  end
+
+  defp find_implementation_of_step(step, steps) do
+    Enum.find(steps, fn ({:{}, _, [r, _, _, _, _]}) ->
+      step.text =~ r |> Code.eval_quoted() |> elem(0)
+    end)
+  end
+
+  defp extract_named_vars(regex, step_text) do
+    regex
+    |> Regex.named_captures(step_text)
+    |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
+    |> Enum.into(%{})
   end
 
   defmacro import_feature(module) do
