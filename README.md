@@ -108,5 +108,6 @@ This provides the best of both worlds. Feature files for non-technical users, an
 # Roadmap
 
 - [ ] Scenario Outlines
+- [ ] Tags implementation
 - [ ] Integration Helpers for Wallaby (separate project?)
 - [ ] Integration Helpers for Hound (separate project?)
