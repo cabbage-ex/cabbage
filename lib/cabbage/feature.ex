@@ -186,11 +186,11 @@ defmodule Cabbage.Feature do
     quote generated: true do
       with {_type, unquote(vars)} <- {:variables, unquote(Macro.escape(named_vars))},
            {_type, state = unquote(state_pattern)} <- {:state, Agent.get(unquote(agent_name(scenario_name)), &(&1))}
-           do
+      do
         new_state = case unquote(block) do
-                     {:ok, new_state} -> Map.merge(new_state, state)
-                     _ -> state
-                   end
+                      {:ok, new_state} -> Map.merge(state, new_state)
+                      _ -> state
+                    end
         Agent.update(unquote(agent_name(scenario_name)), fn(_) -> new_state end)
         Logger.info ["\t\t", IO.ANSI.cyan, unquote(step_type), " ", IO.ANSI.green, unquote(step.text)]
       else
