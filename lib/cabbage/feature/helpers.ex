@@ -6,6 +6,21 @@ defmodule Cabbage.Feature.Helpers do
     quote(do: nil)
   end
 
+  def add_tag(module, "@" <> tag_name, block), do: add_tag(module, tag_name, block)
+  def add_tag(module, tag_name, block) do
+    tags = Module.get_attribute(module, :tags) || []
+    Module.put_attribute(module, :tags, [{tag_name, block} | tags])
+    quote(do: nil)
+  end
+
+  def evaluate_tag_block(block) do
+    {new_state, _} = Code.eval_quoted(block)
+    case new_state do
+      {:ok, state} -> state
+      _ -> %{}
+    end
+  end
+
   def file(file) do
     String.replace_leading file, "#{File.cwd!}/", ""
   end
@@ -22,7 +37,7 @@ defmodule Cabbage.Feature.Helpers do
     :"cabbage_integration_test-#{scenario_name}"
   end
 
-  @keys ~w(async case describe file integration line test type)a
+  @keys ~w(async case describe file integration line test type scenario)a
   def remove_hidden_state(state) do
     Map.drop(state, @keys)
   end

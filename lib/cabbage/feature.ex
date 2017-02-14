@@ -130,11 +130,12 @@ defmodule Cabbage.Feature do
           use ExUnit.Case, unquote(exunit_opts)
         end
       end)
-      @before_compile {unquote(__MODULE__), :expose_steps}
+      @before_compile {unquote(__MODULE__), :expose_metadata}
       import unquote(__MODULE__)
       require Logger
 
       Module.register_attribute(__MODULE__, :steps, accumulate: true)
+      Module.register_attribute(__MODULE__, :tags, [])
 
       unquote(if is_feature do
         quote do
@@ -145,11 +146,15 @@ defmodule Cabbage.Feature do
     end
   end
 
-  defmacro expose_steps(env) do
+  defmacro expose_metadata(env) do
     steps = Module.get_attribute(env.module, :steps)
+    tags = Module.get_attribute(env.module, :tags)
     quote generated: true do
       def raw_steps() do
         unquote(Macro.escape(steps))
+      end
+      def raw_tags() do
+        unquote(Macro.escape(tags))
       end
     end
   end
@@ -157,13 +162,31 @@ defmodule Cabbage.Feature do
   defmacro __before_compile__(env) do
     scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
+    tags = Module.get_attribute(env.module, :tags) || []
     for scenario <- scenarios do
       quote generated: true do
-        @tag :integration
-        test unquote(scenario.name), exunit_state do
-          Agent.start(fn -> exunit_state end, name: unquote(agent_name(scenario.name)))
-          Logger.info ["\t", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
-          unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))
+        describe "Scenario" do
+          @scenario unquote(Macro.escape(scenario))
+          setup context do
+            updated_state = for tag <- unquote(scenario.tags) do
+                              case Enum.find(unquote(Macro.escape(tags)), &(match?({^tag, _}, &1))) do
+                                {^tag, block} ->
+                                  Cabbage.Feature.Helpers.evaluate_tag_block(block)
+                                _ ->
+                                  Logger.warn "Cabbage: Ignoring tag @#{tag}!"
+                                  %{} # Just return something to make reduce work
+                              end
+                            end
+            updated_state = updated_state |> Enum.reduce(%{}, &Map.merge/2)
+            {:ok, Map.merge(context || %{}, updated_state)}
+          end
+
+          @tag :integration
+          test unquote(scenario.name), exunit_state do
+            Agent.start(fn -> exunit_state end, name: unquote(agent_name(scenario.name)))
+            Logger.info ["\t", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
+            unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))
+          end
         end
       end
     end
@@ -233,10 +256,12 @@ defmodule Cabbage.Feature do
         for step <- unquote(module).raw_steps() do
           Module.put_attribute(__MODULE__, :steps, step)
         end
+        for {name, block} <- unquote(module).raw_tags() do
+          Cabbage.Feature.Helpers.add_tag(__MODULE__, name, block)
+        end
       end
     end
   end
-
 
   defmacro defgiven(regex, vars, state, [do: block]) do
     add_step(__CALLER__.module, regex, vars, state, block, metadata(__CALLER__, :defgiven))
@@ -252,5 +277,26 @@ defmodule Cabbage.Feature do
 
   defmacro defthen(regex, vars, state, [do: block]) do
     add_step(__CALLER__.module, regex, vars, state, block, metadata(__CALLER__, :defthen))
+  end
+
+  @doc """
+  Add an ExUnit `setup/1` callback that only fires for the scenarios that are tagged. Can be
+  used inside of `Cabbage.Feature`s that don't relate to a file and then imported with `import_feature/1`.
+
+  Example usage:
+
+      defmodule MyTest do
+        use Cabbage.Feature
+
+        tag @some_tag do
+          IO.puts "Do this before the @some_tag scenario"
+          on_exit fn ->
+            IO.puts "Do this after the @some_tag scenario"
+          end
+        end
+      end
+  """
+  defmacro tag(tag, [do: block]) do
+    add_tag(__CALLER__.module, Macro.to_string(tag), block)
   end
 end
