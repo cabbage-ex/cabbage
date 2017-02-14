@@ -1,3 +1,3 @@
 %{"earmark": {:hex, :earmark, "0.2.1", "ba6d26ceb16106d069b289df66751734802777a3cbb6787026dd800ffeb850f3", [:mix], []},
   "ex_doc": {:hex, :ex_doc, "0.12.0", "b774aabfede4af31c0301aece12371cbd25995a21bb3d71d66f5c2fe074c603f", [:mix], [{:earmark, "~> 0.2", [hex: :earmark, optional: false]}]},
-  "gherkin": {:hex, :gherkin, "1.0.0", "b32e44d67bd8b55149caff8c369517b2ab84fbd3822556f7f963277e82d316f3", [:mix], []}}
+  "gherkin": {:hex, :gherkin, "1.2.0", "39a27ba00aed4cee4165a7d4003b43db671e551854e82c2f8dd07a37a4154aad", [:mix], []}}
