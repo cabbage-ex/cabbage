@@ -1,5 +1,8 @@
 # Changelog
 
+### v0.2.1
+- Bug fix #9 Thanks to @shdblowers - Fixes updating of state properly from one step to the next
+
 ### v0.2.0
 - Support for Scenario Outlines. Scenario Outlines are supported by expanding them into
 basic scenarios by filling in all variables. The name of each scenario is appended to have
