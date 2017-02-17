@@ -117,7 +117,10 @@ defmodule Cabbage.Feature do
         # Omitted the rest
       end
   """
+
   import Cabbage.Feature.Helpers
+
+  alias Cabbage.MissingStepAdvisor
 
   @feature_opts [:file]
   defmacro __using__(opts) do
@@ -204,14 +207,7 @@ defmodule Cabbage.Feature do
   end
 
   defp compile(_, step, step_type, _scenario_name) do
-    raise """
-    Please add a matching step for:
-    "#{step_type} #{step.text}"
-
-      def#{step_type |> String.downcase} ~r/^#{step.text}$/, vars, state do
-        # Your implementation here
-      end
-    """
+    MissingStepAdvisor.raise(step.text, step_type)
   end
 
   defp find_implementation_of_step(step, steps) do
