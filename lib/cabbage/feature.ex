@@ -128,6 +128,7 @@ defmodule Cabbage.Feature do
         quote do
           @before_compile unquote(__MODULE__)
           use ExUnit.Case, unquote(exunit_opts)
+          @feature_file unquote(opts[:file])
         end
       end)
       @before_compile {unquote(__MODULE__), :expose_steps}
@@ -157,12 +158,15 @@ defmodule Cabbage.Feature do
   defmacro __before_compile__(env) do
     scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
-    for scenario <- scenarios do
+    file = Module.get_attribute(env.module, :feature_file)
+    for {scenario, index} <- Enum.with_index(scenarios) do
+      line = index + 1
+      name = ExUnit.Case.register_test(%{env | line: line}, :test, scenario.name, [])
       quote generated: true do
         @tag :integration
-        test unquote(scenario.name), exunit_state do
+        def unquote(name)(exunit_state) do
           Agent.start(fn -> exunit_state end, name: unquote(agent_name(scenario.name)))
-          Logger.info ["\t", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
+          Logger.info [IO.ANSI.color(61), "Line ", to_string(unquote(line)), ":  ", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
           unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))
         end
       end

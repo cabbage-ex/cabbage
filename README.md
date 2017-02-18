@@ -1,6 +1,6 @@
 # Cabbage
 
-[![Build Status](https://semaphoreci.com/api/v1/cabbage-ex/cabbage/branches/master/shields_badge.svg)](https://semaphoreci.com/cabbage-ex/cabbage) 
+[![Build Status](https://semaphoreci.com/api/v1/cabbage-ex/cabbage/branches/master/shields_badge.svg)](https://semaphoreci.com/cabbage-ex/cabbage)
 [![Hex.pm](https://img.shields.io/hexpm/v/cabbage.svg)]()
 
 <img src="https://www.organicfacts.net/wp-content/uploads/2013/12/redcabbage.jpg" width="240px" height="180px"></img>
@@ -109,10 +109,18 @@ end
 
 This provides the best of both worlds. Feature files for non-technical users, and an actual test file written in Elixir for developers that have to maintain them.
 
+### Running specific tests
+
+Typically to run an ExUnit test you would do something like `mix test test/some_test.exs:12` and that would run `test/some_test.exs` but only for the test on line `12`. Since the feature files are being translated into ExUnit at compile time, you'll have to specify the `.exs` file and not the `.feature` file to run. The line numbers are printed out as each test runs (at the `:info` level, so you may need to increase your logger config if you dont see anything). An example is like as follows:
+
+    # Runs scenario of test/features/coffee.feature on line 13 (because its the second scenario)
+    mix test test/feature_test.exs:2
+
 # Roadmap
 
 - [x] Scenarios
 - [x] Scenario Outlines
+- [ ] Executing specific tests
 - [ ] ExUnit Case Templates
 - [ ] Tags implementation
 - [ ] Integration Helpers for Wallaby (separate project?)
