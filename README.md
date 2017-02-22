@@ -120,7 +120,6 @@ Typically to run an ExUnit test you would do something like `mix test test/some_
 
 - [x] Scenarios
 - [x] Scenario Outlines
-- [ ] Executing specific tests
 - [ ] ExUnit Case Templates
 - [ ] Executing specific tests
 - [ ] Tags implementation
