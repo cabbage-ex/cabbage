@@ -33,13 +33,25 @@ defmodule Cabbage.Feature.Helpers do
     [{module, metadata[:function], metadata[:arity], [file: metadata[:file], line: metadata[:line]]}]
   end
 
-  def agent_name(scenario_name) do
-    :"cabbage_integration_test-#{scenario_name}"
+  def agent_name(scenario_name, module_name) do
+    :"cabbage_integration_test-#{scenario_name}-#{module_name}"
   end
 
-  @keys ~w(async case describe file integration line test type scenario)a
+  @keys ~w(async case describe file integration line test type scenario registered)a
   def remove_hidden_state(state) do
     Map.drop(state, @keys)
+  end
+
+  def fetch_state(scenario_name, module_name) do
+    scenario_name
+    |> agent_name(module_name)
+    |> Agent.get(&(&1))
+  end
+
+  def update_state(scenario_name, module_name, fun) do
+    scenario_name
+    |> agent_name(module_name)
+    |> Agent.update(fun)
   end
 
 end
