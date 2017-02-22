@@ -3,6 +3,7 @@ Feature: Serve coffee
   Coffee should not be served until the button has been pressed
   If there is no coffee left then money should be refunded
 
+  @coffee
   Scenario Outline: Buy coffee
     Given there are <coffees> coffees left in the machine
     And I have deposited $<money>
