@@ -116,5 +116,6 @@ This provides the best of both worlds. Feature files for non-technical users, an
 - [ ] ExUnit Case Templates
 - [ ] Executing specific tests
 - [ ] Tags implementation
+- [ ] Background steps
 - [ ] Integration Helpers for Wallaby (separate project?)
 - [ ] Integration Helpers for Hound (separate project?)
