@@ -3,6 +3,7 @@
 ### v0.2.2
 - Support for ExUnit case templates. Simply specify the case template module name like
 `use Cabbage, template: MyApp.ConnCase, feature: "some_file.feature"`
+- Support for tags as ExUnit setup callbacks.
 
 ### v0.2.1
 - Bug fix #9 Thanks to @shdblowers - Fixes updating of state properly from one step to the next
