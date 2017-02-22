@@ -1,5 +1,7 @@
 defmodule Cabbage.Feature.Helpers do
   @moduledoc false
+  require Logger
+
   def add_step(module, regex, vars, state, block, metadata) do
     steps = Module.get_attribute(module, :steps) || []
     Module.put_attribute(module, :steps, [{:{}, [], [regex, vars, state, block, metadata]} | steps])
@@ -37,15 +39,24 @@ defmodule Cabbage.Feature.Helpers do
     :"cabbage_integration_test-#{scenario_name}-#{module_name}"
   end
 
-  @keys ~w(async case describe file integration line test type scenario registered)a
+  @keys ~w(async case describe file integration line test type scenario case_templae registered)a
   def remove_hidden_state(state) do
     Map.drop(state, @keys)
   end
 
+  def start_state(scenario_name, module_name, state) do
+    name = scenario_name |> agent_name(module_name)
+    agent = Process.whereis(name)
+    if agent do
+      update_state(scenario_name, module_name, fn s -> Map.merge(s, state) |> remove_hidden_state() end)
+    else
+      Agent.start(fn -> state end, name: name)
+    end
+  end
+
   def fetch_state(scenario_name, module_name) do
-    scenario_name
-    |> agent_name(module_name)
-    |> Agent.get(&(&1))
+    name = scenario_name |> agent_name(module_name)
+    (Process.whereis(name) && Agent.get(name, &(&1)) || %{}) |> remove_hidden_state()
   end
 
   def update_state(scenario_name, module_name, fun) do

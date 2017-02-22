@@ -168,22 +168,22 @@ defmodule Cabbage.Feature do
         describe "Scenario" do
           @scenario unquote(Macro.escape(scenario))
           setup context do
-            updated_state = for tag <- unquote(scenario.tags) do
-                              case Enum.find(unquote(Macro.escape(tags)), &(match?({^tag, _}, &1))) do
-                                {^tag, block} ->
-                                  Cabbage.Feature.Helpers.evaluate_tag_block(block)
-                                _ ->
-                                  Logger.warn "Cabbage: Ignoring tag @#{tag}!"
-                                  %{} # Just return something to make reduce work
-                              end
-                            end
-            updated_state = updated_state |> Enum.reduce(%{}, &Map.merge/2)
-            {:ok, Map.merge(context || %{}, updated_state)}
+            for tag <- unquote(scenario.tags) do
+              case Enum.find(unquote(Macro.escape(tags)), &(match?({^tag, _}, &1))) do
+                {^tag, block} ->
+                  Logger.debug "Cabbage: Running tag @#{tag}..."
+                  state = Cabbage.Feature.Helpers.evaluate_tag_block(block)
+                  Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, state)
+                _ ->
+                  Logger.warn "Cabbage: Ignoring tag @#{tag}!"
+              end
+            end
+            {:ok, Map.merge(context || %{}, Cabbage.Feature.Helpers.fetch_state(unquote(scenario.name), __MODULE__))}
           end
 
           @tag :integration
           test unquote(scenario.name), exunit_state do
-            Agent.start(fn -> exunit_state end, name: unquote(agent_name(scenario.name, env.module)))
+            Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
             Logger.info ["\t", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
             unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))
           end
@@ -298,6 +298,6 @@ defmodule Cabbage.Feature do
       end
   """
   defmacro tag(tag, [do: block]) do
-    add_tag(__CALLER__.module, Macro.to_string(tag), block)
+    add_tag(__CALLER__.module, Macro.to_string(tag) |> String.replace(~r/\s*/, ""), block)
   end
 end
