@@ -188,9 +188,9 @@ defmodule Cabbage.Feature do
            {_type, state = unquote(state_pattern)} <- {:state, Cabbage.Feature.Helpers.fetch_state(unquote(scenario_name), __MODULE__)}
            do
         new_state = case unquote(block) do
-                     {:ok, new_state} -> Map.merge(new_state, state)
-                     _ -> state
-                   end
+                      {:ok, new_state} -> Map.merge(state, new_state)
+                      _ -> state
+                    end
         Cabbage.Feature.Helpers.update_state(unquote(scenario_name), __MODULE__, fn(_) -> new_state end)
         Logger.info ["\t\t", IO.ANSI.cyan, unquote(step_type), " ", IO.ANSI.green, unquote(step.text)]
       else
