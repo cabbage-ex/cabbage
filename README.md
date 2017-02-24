@@ -1,6 +1,6 @@
 # Cabbage
 
-[![Build Status](https://semaphoreci.com/api/v1/cabbage-ex/cabbage/branches/master/shields_badge.svg)](https://semaphoreci.com/cabbage-ex/cabbage) 
+[![Build Status](https://semaphoreci.com/api/v1/cabbage-ex/cabbage/branches/master/shields_badge.svg)](https://semaphoreci.com/cabbage-ex/cabbage)
 [![Hex.pm](https://img.shields.io/hexpm/v/cabbage.svg)]()
 
 <img src="https://www.organicfacts.net/wp-content/uploads/2013/12/redcabbage.jpg" width="240px" height="180px"></img>
@@ -18,7 +18,7 @@ A simple addon on top of [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) which 
 
     ```elixir
     def deps do
-      [{:cabbage, "~> 0.1.0"}]
+      [{:cabbage, "~> 0.2.0"}]
     end
     ```
 
@@ -113,7 +113,9 @@ This provides the best of both worlds. Feature files for non-technical users, an
 
 - [x] Scenarios
 - [x] Scenario Outlines
-- [ ] ExUnit Case Templates
-- [ ] Tags implementation
+- [x] ExUnit Case Templates
+- [ ] Executing specific tests
+- [x] Tags implementation
+- [ ] Background steps
 - [ ] Integration Helpers for Wallaby (separate project?)
 - [ ] Integration Helpers for Hound (separate project?)
