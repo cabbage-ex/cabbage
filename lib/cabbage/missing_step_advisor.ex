@@ -2,7 +2,9 @@ defmodule Cabbage.MissingStepAdvisor do
 
   def raise(step_text, step_type) do
 
-    converted_step_text = convert_numbers_to_regex_capture_group(step_text)
+    converted_step_text =
+      step_text
+      |> convert_numbers_to_regex_capture_group()
 
     raise """
     Please add a matching step for:
