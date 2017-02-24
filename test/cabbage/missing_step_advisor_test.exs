@@ -61,7 +61,7 @@ defmodule Cabbage.MissingStepAdvisorTest do
     Please add a matching step for:
     "And I am 49 years old"
 
-      defand ~r/^I am (?<number>\d+) years old$/, vars, state do
+      defand ~r/^I am (?<number>\\d+) years old$/, vars, state do
         # Your implementation here
       end
     """
@@ -78,7 +78,7 @@ defmodule Cabbage.MissingStepAdvisorTest do
     Please add a matching step for:
     "When the 3rd number is 1101"
 
-      defwhen ~r/^the 3rd number is (?<number>\d+)$/, vars, state do
+      defwhen ~r/^the 3rd number is (?<number>\\d+)$/, vars, state do
         # Your implementation here
       end
     """

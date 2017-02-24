@@ -19,7 +19,7 @@ defmodule Cabbage.MissingStepAdvisor do
   end
 
   defp convert_numbers(step_text) do
-    Regex.replace(~r/(\s)\d+(\s|$)/, step_text, "\\1(?<number>\d+)\\2")
+    Regex.replace(~r/(\s)\d+(\s|$)/, step_text, ~s/\\1(?<number>\\d+)\\2/)
   end
 
   defp convert_double_quote_strings(step_text) do
