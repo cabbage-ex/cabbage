@@ -4,8 +4,9 @@ defmodule Cabbage.MissingStepAdvisor do
 
     converted_step_text =
       step_text
-      |> convert_numbers_to_regex_capture_group()
-      |> convert_strings_to_regex_capture_group()
+      |> convert_numbers()
+      |> convert_double_quote_strings()
+      |> convert_single_quote_strings()
 
     raise """
     Please add a matching step for:
@@ -17,12 +18,16 @@ defmodule Cabbage.MissingStepAdvisor do
     """
   end
 
-  defp convert_numbers_to_regex_capture_group(step_text) do
+  defp convert_numbers(step_text) do
     Regex.replace(~r/(\s)\d+(\s|$)/, step_text, "\\1(?<number>\d+)\\2")
   end
 
-  defp convert_strings_to_regex_capture_group(step_text) do
+  defp convert_double_quote_strings(step_text) do
     Regex.replace(~r/"(?<string>[^"]+)"/, step_text, ~s/"(?<string>[^"]+)"/)
+  end
+
+  defp convert_single_quote_strings(step_text) do
+    Regex.replace(~r/'(?<string>[^']+)'/, step_text, ~s/'(?<string>[^']+)'/)
   end
 
 end
