@@ -20,6 +20,23 @@ defmodule Cabbage.MissingStepAdvisorTest do
                  fn -> Sut.raise(step_text, step_type) end)
   end
 
+  test "convert strings to regex capture group in message" do
+    step_text = "my name is \"Miran\""
+    step_type = "Given"
+    expected_message = """
+    Please add a matching step for:
+    "Given my name is "Miran""
+
+      defgiven ~r/^my name is "(?<string>[^"]+)"$/, vars, state do
+        # Your implementation here
+      end
+    """
+
+    assert_raise(RuntimeError,
+                 expected_message,
+                 fn -> Sut.raise(step_text, step_type) end)
+  end
+
   test "convert numbers to regex capture group in message" do
     step_text = "I am 49 years old"
     step_type = "And"

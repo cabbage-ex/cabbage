@@ -5,6 +5,7 @@ defmodule Cabbage.MissingStepAdvisor do
     converted_step_text =
       step_text
       |> convert_numbers_to_regex_capture_group()
+      |> convert_strings_to_regex_capture_group()
 
     raise """
     Please add a matching step for:
@@ -18,6 +19,10 @@ defmodule Cabbage.MissingStepAdvisor do
 
   defp convert_numbers_to_regex_capture_group(step_text) do
     Regex.replace(~r/(\s)\d+(\s|$)/, step_text, "\\1(?<number>\d+)\\2")
+  end
+
+  defp convert_strings_to_regex_capture_group(step_text) do
+    Regex.replace(~r/"(?<string>[^"]+)"/, step_text, ~s/"(?<string>[^"]+)"/)
   end
 
 end
