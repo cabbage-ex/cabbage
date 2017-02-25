@@ -75,6 +75,21 @@ defmodule MissingStepAdvisorTest do
     assert_correct_message(step_text, step_type, expected_message)
   end
 
+  test "convert numbers to capture group where number is at the beginning" do
+    step_text = "29 is my favourite number"
+    step_type = "Given"
+    expected_message = """
+    Please add a matching step for:
+    "Given 29 is my favourite number"
+
+      defgiven ~r/^(?<number>\\d+) is my favourite number$/, vars, state do
+        # Your implementation here
+      end
+    """
+
+    assert_correct_message(step_text, step_type, expected_message)
+  end
+
   defp assert_correct_message(step_text, step_type, expected_message) do
     assert_raise(MissingStepError,
                  expected_message,
