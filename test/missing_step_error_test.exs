@@ -13,11 +13,7 @@ defmodule MissingStepAdvisorTest do
       end
     """
 
-    assert_raise(MissingStepError,
-                 expected_message,
-                 fn ->
-                   raise MissingStepError, [step_text: step_text, step_type: step_type]
-                 end)
+    assert_correct_message(step_text, step_type, expected_message)
   end
 
   test "convert double quote strings to regex capture group in message" do
@@ -31,12 +27,7 @@ defmodule MissingStepAdvisorTest do
         # Your implementation here
       end
     """
-
-    assert_raise(MissingStepError,
-                 expected_message,
-                 fn ->
-                   raise MissingStepError, [step_text: step_text, step_type: step_type]
-                 end)
+    assert_correct_message(step_text, step_type, expected_message)
   end
 
   test "convert single quote strings to regex capture group in message" do
@@ -51,11 +42,7 @@ defmodule MissingStepAdvisorTest do
       end
     """
 
-    assert_raise(MissingStepError,
-                 expected_message,
-                 fn ->
-                   raise MissingStepError, [step_text: step_text, step_type: step_type]
-                 end)
+    assert_correct_message(step_text, step_type, expected_message)
   end
 
   test "convert numbers to regex capture group in message" do
@@ -70,11 +57,7 @@ defmodule MissingStepAdvisorTest do
       end
     """
 
-    assert_raise(MissingStepError,
-                 expected_message,
-                 fn ->
-                   raise MissingStepError, [step_text: step_text, step_type: step_type]
-                 end)
+    assert_correct_message(step_text, step_type, expected_message)
   end
 
   test "converting numbers to regex capture group ignores numbers with letters" do
@@ -89,6 +72,10 @@ defmodule MissingStepAdvisorTest do
       end
     """
 
+    assert_correct_message(step_text, step_type, expected_message)
+  end
+
+  defp assert_correct_message(step_text, step_type, expected_message) do
     assert_raise(MissingStepError,
                  expected_message,
                  fn ->
