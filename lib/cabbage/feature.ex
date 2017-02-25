@@ -120,8 +120,6 @@ defmodule Cabbage.Feature do
 
   import Cabbage.Feature.Helpers
 
-  alias Cabbage.MissingStepAdvisor
-
   @feature_opts [:file, :template]
 
   defmacro __using__(opts) do
@@ -232,7 +230,9 @@ defmodule Cabbage.Feature do
   end
 
   defp compile(_, step, step_type, _scenario_name) do
-    MissingStepAdvisor.raise(step.text, step_type)
+    # MissingStepAdvisor.raise(step.text, step_type)
+
+    raise MissingStepError, [step_text: step.text, step_type: step_type]
   end
 
   defp find_implementation_of_step(step, steps) do

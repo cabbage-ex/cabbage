@@ -1,8 +1,6 @@
 defmodule Cabbage.MissingStepAdvisorTest do
   use ExUnit.Case, async: true
 
-  alias Cabbage.MissingStepAdvisor, as: Sut
-
   test "raises RuntimeError if step is missing" do
     step_text = "I am Bob"
     step_type = "Given"
@@ -15,9 +13,11 @@ defmodule Cabbage.MissingStepAdvisorTest do
       end
     """
 
-    assert_raise(RuntimeError,
+    assert_raise(MissingStepError,
                  expected_message,
-                 fn -> Sut.raise(step_text, step_type) end)
+                 fn ->
+                   raise MissingStepError, [step_text: step_text, step_type: step_type]
+                 end)
   end
 
   test "convert double quote strings to regex capture group in message" do
@@ -32,9 +32,11 @@ defmodule Cabbage.MissingStepAdvisorTest do
       end
     """
 
-    assert_raise(RuntimeError,
+    assert_raise(MissingStepError,
                  expected_message,
-                 fn -> Sut.raise(step_text, step_type) end)
+                 fn ->
+                   raise MissingStepError, [step_text: step_text, step_type: step_type]
+                 end)
   end
 
   test "convert single quote strings to regex capture group in message" do
@@ -49,9 +51,11 @@ defmodule Cabbage.MissingStepAdvisorTest do
       end
     """
 
-    assert_raise(RuntimeError,
+    assert_raise(MissingStepError,
                  expected_message,
-                 fn -> Sut.raise(step_text, step_type) end)
+                 fn ->
+                   raise MissingStepError, [step_text: step_text, step_type: step_type]
+                 end)
   end
 
   test "convert numbers to regex capture group in message" do
@@ -66,9 +70,11 @@ defmodule Cabbage.MissingStepAdvisorTest do
       end
     """
 
-    assert_raise(RuntimeError,
+    assert_raise(MissingStepError,
                  expected_message,
-                 fn -> Sut.raise(step_text, step_type) end)
+                 fn ->
+                   raise MissingStepError, [step_text: step_text, step_type: step_type]
+                 end)
   end
 
   test "converting numbers to regex capture group ignores numbers with letters" do
@@ -83,8 +89,10 @@ defmodule Cabbage.MissingStepAdvisorTest do
       end
     """
 
-    assert_raise(RuntimeError,
+    assert_raise(MissingStepError,
                  expected_message,
-                 fn -> Sut.raise(step_text, step_type) end)
+                 fn ->
+                   raise MissingStepError, [step_text: step_text, step_type: step_type]
+                 end)
   end
 end

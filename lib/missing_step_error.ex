@@ -1,4 +1,4 @@
-defmodule Cabbage.MissingStepAdvisor do
+defmodule MissingStepError do
   @moduledoc """
   Raises an error, because a feature step is missing its implementation.
 
@@ -6,15 +6,16 @@ defmodule Cabbage.MissingStepAdvisor do
   variables in feature steps are converted to regex capture groups.
   """
 
-  def raise(step_text, step_type) do
+  defexception [:message]
 
+  def exception(step_text: step_text, step_type: step_type) do
     converted_step_text =
       step_text
       |> convert_numbers()
       |> convert_double_quote_strings()
       |> convert_single_quote_strings()
 
-    raise """
+    message = """
     Please add a matching step for:
     "#{step_type} #{step_text}"
 
@@ -22,6 +23,8 @@ defmodule Cabbage.MissingStepAdvisor do
         # Your implementation here
       end
     """
+
+    %__MODULE__{message: message}
   end
 
   defp convert_numbers(step_text) do
