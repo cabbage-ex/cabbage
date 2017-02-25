@@ -230,8 +230,6 @@ defmodule Cabbage.Feature do
   end
 
   defp compile(_, step, step_type, _scenario_name) do
-    # MissingStepAdvisor.raise(step.text, step_type)
-
     raise MissingStepError, [step_text: step.text, step_type: step_type]
   end
 
