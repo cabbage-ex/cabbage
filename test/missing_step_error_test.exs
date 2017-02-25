@@ -1,4 +1,4 @@
-defmodule Cabbage.MissingStepAdvisorTest do
+defmodule MissingStepAdvisorTest do
   use ExUnit.Case, async: true
 
   test "raises RuntimeError if step is missing" do
