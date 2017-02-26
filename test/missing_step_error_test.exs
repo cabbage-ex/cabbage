@@ -52,7 +52,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "And I am 49 years old"
 
-      defand ~r/^I am (?<number>\\d+) years old$/, vars, state do
+      defand ~r/^I am (?<number_1>\\d+) years old$/, vars, state do
         # Your implementation here
       end
     """
@@ -67,7 +67,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "When the 3rd number is 1101"
 
-      defwhen ~r/^the 3rd number is (?<number>\\d+)$/, vars, state do
+      defwhen ~r/^the 3rd number is (?<number_1>\\d+)$/, vars, state do
         # Your implementation here
       end
     """
@@ -82,7 +82,22 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "Given 29 is my favourite number"
 
-      defgiven ~r/^(?<number>\\d+) is my favourite number$/, vars, state do
+      defgiven ~r/^(?<number_1>\\d+) is my favourite number$/, vars, state do
+        # Your implementation here
+      end
+    """
+
+    assert_correct_message(step_text, step_type, expected_message)
+  end
+
+  test "convert multiple numbers to capture groups" do
+    step_text = "there are 3 on the left and 2 on the right"
+    step_type = "And"
+    expected_message = """
+    Please add a matching step for:
+    "And there are 3 on the left and 2 on the right"
+
+      defand ~r/^there are (?<number_1>\\d+) on the left and (?<number_2>\\d+) on the right$/, vars, state do
         # Your implementation here
       end
     """
