@@ -9,6 +9,8 @@ defmodule MissingStepError do
   defexception [:message]
 
   @number_regex ~r/(^|\s)\d+(\s|$)/
+  @single_quote_regex ~r/'(?<string>[^']+)'/
+  @double_quote_regex ~r/"(?<string>[^"]+)"/
 
   def exception(step_text: step_text, step_type: step_type) do
     converted_step_text =
@@ -38,11 +40,11 @@ defmodule MissingStepError do
   end
 
   defp convert_double_quote_strings(step_text) do
-    Regex.replace(~r/"(?<string>[^"]+)"/, step_text, ~s/"(?<string>[^"]+)"/)
+    Regex.replace(@double_quote_regex, step_text, ~s/"(?<string>[^"]+)"/)
   end
 
   defp convert_single_quote_strings(step_text) do
-    Regex.replace(~r/'(?<string>[^']+)'/, step_text, ~s/'(?<string>[^']+)'/)
+    Regex.replace(@single_quote_regex, step_text, ~s/'(?<string>[^']+)'/)
   end
 
   defp multi_num(step_text, _count, false), do: step_text
