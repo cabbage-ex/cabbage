@@ -9,8 +9,8 @@ defmodule MissingStepError do
   defexception [:message]
 
   @number_regex ~r/(^|\s)\d+(\s|$)/
-  @single_quote_regex ~r/'(?<string>[^']+)'/
-  @double_quote_regex ~r/"(?<string>[^"]+)"/
+  @single_quote_regex ~r/'[^']+'/
+  @double_quote_regex ~r/"[^"]+"/
 
   def exception(step_text: step_text, step_type: step_type) do
     converted_step_text =
