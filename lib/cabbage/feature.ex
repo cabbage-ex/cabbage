@@ -117,11 +117,9 @@ defmodule Cabbage.Feature do
         # Omitted the rest
       end
   """
-
   import Cabbage.Feature.Helpers
 
   @feature_opts [:file, :template]
-
   defmacro __using__(opts) do
     {opts, exunit_opts} = Keyword.split(opts, @feature_opts)
     is_feature = !match?(nil, opts[:file])
