@@ -133,7 +133,7 @@ $ docker-compose run --rm test deps.update --all
 Or, if you want to run a single test, that can be accomplished with:
 
 ```shell
-$ docker-compose run --rm test test/feature_test.exs
+$ docker-compose run --rm cabbage test test/feature_test.exs
 ```
 
 # Roadmap
