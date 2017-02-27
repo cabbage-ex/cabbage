@@ -15,7 +15,7 @@ defmodule MissingStepError do
   def exception(step_text: step_text, step_type: step_type) do
     converted_step_text =
       step_text
-      |> multi_num(1, &match_numbers?(&1))
+      |> convert_multiples(&match_numbers?/1, &convert_numbers/2)
       |> convert_double_quote_strings()
       |> convert_single_quote_strings()
 
@@ -29,6 +29,19 @@ defmodule MissingStepError do
     """
 
     %__MODULE__{message: message}
+  end
+
+  defp convert_multiples(step_text, match_fun, convert_fun) do
+    convert_multiples(step_text, match_fun, convert_fun, 1)
+  end
+
+  defp convert_multiples(step_text, match_fun, convert_fun, count) do
+    case match_fun.(step_text) do
+      false ->
+        step_text
+      _ ->
+        convert_multiples(convert_fun.(step_text, count), match_fun, convert_fun, count + 1)
+    end
   end
 
   defp match_numbers?(step_text) do
@@ -46,11 +59,4 @@ defmodule MissingStepError do
   defp convert_single_quote_strings(step_text) do
     Regex.replace(@single_quote_regex, step_text, ~s/'(?<string>[^']+)'/)
   end
-
-  defp multi_num(step_text, _count, false), do: step_text
-  defp multi_num(step_text, count, _run_result) do
-    converted_step_text = convert_numbers(step_text, count)
-    multi_num(converted_step_text, count + 1, match_numbers?(converted_step_text))
-  end
-
 end
