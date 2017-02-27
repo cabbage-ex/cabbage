@@ -119,6 +119,11 @@ A `docker-compose.yml` is provided for running the tests in containers.
 $ docker-compose up
 ```
 
+To wipe all `_build` and `deps` you can run:
+```shell
+$ docker-compose down -v
+```
+
 If you want to interactive, using standard `mix` commands, such as updating dependencies:
 
 ```shell
