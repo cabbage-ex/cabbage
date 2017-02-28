@@ -119,7 +119,7 @@ defmodule Cabbage.Feature do
   """
   import Cabbage.Feature.Helpers
 
-  @feature_opts [:file]
+  @feature_opts [:file, :template]
   defmacro __using__(opts) do
     {opts, exunit_opts} = Keyword.split(opts, @feature_opts)
     is_feature = !match?(nil, opts[:file])
@@ -127,15 +127,15 @@ defmodule Cabbage.Feature do
       unquote(if is_feature do
         quote do
           @before_compile unquote(__MODULE__)
-          use ExUnit.Case, unquote(exunit_opts)
-          @feature_file unquote(opts[:file])
+          use unquote(opts[:template] || ExUnit.Case), unquote(exunit_opts)
         end
       end)
-      @before_compile {unquote(__MODULE__), :expose_steps}
+      @before_compile {unquote(__MODULE__), :expose_metadata}
       import unquote(__MODULE__)
       require Logger
 
       Module.register_attribute(__MODULE__, :steps, accumulate: true)
+      Module.register_attribute(__MODULE__, :tags, [])
 
       unquote(if is_feature do
         quote do
@@ -146,11 +146,15 @@ defmodule Cabbage.Feature do
     end
   end
 
-  defmacro expose_steps(env) do
+  defmacro expose_metadata(env) do
     steps = Module.get_attribute(env.module, :steps)
+    tags = Module.get_attribute(env.module, :tags)
     quote generated: true do
       def raw_steps() do
         unquote(Macro.escape(steps))
+      end
+      def raw_tags() do
+        unquote(Macro.escape(tags))
       end
     end
   end
@@ -158,16 +162,32 @@ defmodule Cabbage.Feature do
   defmacro __before_compile__(env) do
     scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
-    file = Module.get_attribute(env.module, :feature_file)
-    for {scenario, index} <- Enum.with_index(scenarios) do
-      line = index + 1
-      name = ExUnit.Case.register_test(%{env | line: line}, :test, scenario.name, [])
+    tags = Module.get_attribute(env.module, :tags) || []
+    for scenario <- scenarios do
       quote generated: true do
-        @tag :integration
-        def unquote(name)(exunit_state) do
-          Agent.start(fn -> exunit_state end, name: unquote(agent_name(scenario.name)))
-          Logger.info [IO.ANSI.color(61), "Line ", to_string(unquote(line)), ":  ", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
-          unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))
+        describe "Scenario" do
+          @scenario unquote(Macro.escape(scenario))
+          setup context do
+            for tag <- unquote(scenario.tags) do
+              case Enum.find(unquote(Macro.escape(tags)), &(match?({^tag, _}, &1))) do
+                {^tag, block} ->
+                  Logger.debug "Cabbage: Running tag @#{tag}..."
+                  state = Cabbage.Feature.Helpers.evaluate_tag_block(block)
+                  Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, state)
+                _ ->
+                  Logger.warn "Cabbage: Ignoring tag @#{tag}!"
+              end
+            end
+            {:ok, Map.merge(context || %{}, Cabbage.Feature.Helpers.fetch_state(unquote(scenario.name), __MODULE__))}
+          end
+
+          ExUnit.Case.register_test(unquote(Macro.escape(%{env | line: scenario.line})), :test, unquote(scenario.name), [])
+          @tag :integration
+          def unquote(:"test Scenario #{scenario.name}")(exunit_state) do
+            Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
+            Logger.info [IO.ANSI.color(61), "Line ", to_string(unquote(scenario.line)), ":  ", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
+            unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))
+          end
         end
       end
     end
@@ -189,19 +209,20 @@ defmodule Cabbage.Feature do
     named_vars = extract_named_vars(regex, step.text)
     quote generated: true do
       with {_type, unquote(vars)} <- {:variables, unquote(Macro.escape(named_vars))},
-           {_type, state = unquote(state_pattern)} <- {:state, Agent.get(unquote(agent_name(scenario_name)), &(&1))}
-      do
+           {_type, state = unquote(state_pattern)} <- {:state, Cabbage.Feature.Helpers.fetch_state(unquote(scenario_name), __MODULE__)}
+           do
         new_state = case unquote(block) do
                       {:ok, new_state} -> Map.merge(state, new_state)
                       _ -> state
                     end
-        Agent.update(unquote(agent_name(scenario_name)), fn(_) -> new_state end)
+        Cabbage.Feature.Helpers.update_state(unquote(scenario_name), __MODULE__, fn(_) -> new_state end)
         Logger.info ["\t\t", IO.ANSI.cyan, unquote(step_type), " ", IO.ANSI.green, unquote(step.text)]
       else
         {type, state} ->
           metadata = unquote(Macro.escape(metadata))
           reraise """
           ** (MatchError) Failure to match #{type} of #{inspect Cabbage.Feature.Helpers.remove_hidden_state(state)}
+          Pattern: #{unquote(Macro.to_string(state_pattern))}
           """, Cabbage.Feature.Helpers.stacktrace(__MODULE__, metadata)
       end
     end
@@ -237,10 +258,12 @@ defmodule Cabbage.Feature do
         for step <- unquote(module).raw_steps() do
           Module.put_attribute(__MODULE__, :steps, step)
         end
+        for {name, block} <- unquote(module).raw_tags() do
+          Cabbage.Feature.Helpers.add_tag(__MODULE__, name, block)
+        end
       end
     end
   end
-
 
   defmacro defgiven(regex, vars, state, [do: block]) do
     add_step(__CALLER__.module, regex, vars, state, block, metadata(__CALLER__, :defgiven))
@@ -256,5 +279,26 @@ defmodule Cabbage.Feature do
 
   defmacro defthen(regex, vars, state, [do: block]) do
     add_step(__CALLER__.module, regex, vars, state, block, metadata(__CALLER__, :defthen))
+  end
+
+  @doc """
+  Add an ExUnit `setup/1` callback that only fires for the scenarios that are tagged. Can be
+  used inside of `Cabbage.Feature`s that don't relate to a file and then imported with `import_feature/1`.
+
+  Example usage:
+
+      defmodule MyTest do
+        use Cabbage.Feature
+
+        tag @some_tag do
+          IO.puts "Do this before the @some_tag scenario"
+          on_exit fn ->
+            IO.puts "Do this after the @some_tag scenario"
+          end
+        end
+      end
+  """
+  defmacro tag(tag, [do: block]) do
+    add_tag(__CALLER__.module, Macro.to_string(tag) |> String.replace(~r/\s*/, ""), block)
   end
 end

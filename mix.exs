@@ -1,7 +1,7 @@
 defmodule Cabbage.Mixfile do
   use Mix.Project
 
-  @version "0.2.1"
+  @version "0.2.2"
   def project do
     [
       app: :cabbage,
@@ -45,7 +45,8 @@ defmodule Cabbage.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:gherkin, "~> 1.2"},
+      # {:gherkin, "~> 1.2"},
+      {:gherkin, github: "cabbage-ex/gherkin"},
       {:ex_doc, "~> 0.10", only: :dev},
       {:earmark, "~> 0.1", only: :dev}
     ]

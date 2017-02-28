@@ -18,7 +18,7 @@ A simple addon on top of [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) which 
 
     ```elixir
     def deps do
-      [{:cabbage, "~> 0.1.0"}]
+      [{:cabbage, "~> 0.2.0"}]
     end
     ```
 
@@ -120,8 +120,9 @@ Typically to run an ExUnit test you would do something like `mix test test/some_
 
 - [x] Scenarios
 - [x] Scenario Outlines
-- [ ] ExUnit Case Templates
+- [x] ExUnit Case Templates
 - [ ] Executing specific tests
-- [ ] Tags implementation
+- [x] Tags implementation
+- [ ] Background steps
 - [ ] Integration Helpers for Wallaby (separate project?)
 - [ ] Integration Helpers for Hound (separate project?)
