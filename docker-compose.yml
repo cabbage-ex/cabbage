@@ -8,7 +8,7 @@ services:
   cabbage:
     image: elixir:1.4
     entrypoint: mix
-    command: do local.hex --force, deps.get, deps.compile, test
+    command: do local.hex --force, deps.get, deps.compile, test --only integration
     environment:
       MIX_ENV: test
     working_dir: /code
