@@ -12,10 +12,39 @@ defmodule MissingStepError do
   @single_quote_regex ~r/'[^']+'/
   @double_quote_regex ~r/"[^"]+"/
 
+
+"""
+
+iex(1)> string = "I set my name to \"Dan\" and also \"John\" "
+"I set my name to \"Dan\" and also \"John\" "
+iex(2)> regex = ~r/"[^"]+"/
+~r/"[^"]+"/
+iex(3)> Regex.split(regex, string)
+["I set my name to ", " and also ", " "]
+iex(4)> res = Regex.split(regex, string)
+["I set my name to ", " and also ", " "]
+iex(5)> Enum.reduce(res, "", fn(x, acc) -> acc <> "\"(?<>)\"" <> x end)
+"\"(?<>)\"I set my name to \"(?<>)\" and also \"(?<>)\" "
+iex(6)> Regex.split(~r/3425345435/, string)
+["I set my name to \"Dan\" and also \"John\" "]
+iex(7)> string = "34 hello 45"
+"34 hello 45"
+iex(8)> regex2 = ~r/(^|\s)\d+(\s|$)/
+~r/(^|\s)\d+(\s|$)/
+iex(9)> Regex.split(regex2, string)
+["", "hello", ""]
+iex(10)>
+
+
+
+
+"""
+
   def exception(step_text: step_text, step_type: step_type) do
     converted_step_text =
       step_text
       |> convert_multiples(&match_numbers?/1, &convert_numbers/2)
+      # |> reduce_num_split(&Regex.split(@number_regex, &1), 1)
       |> convert_double_quote_strings()
       |> convert_single_quote_strings()
 
@@ -43,6 +72,12 @@ defmodule MissingStepError do
         convert_multiples(convert_fun.(step_text, count), match_fun, convert_fun, count + 1)
     end
   end
+
+  # defp reduce_num_split([str1 | [str2 | tail]], count) do
+  #   reduce_num_split([str1 <> ~s/(?<number_#{count}>\\d+)/ | tail], count + 1)
+  # end
+  #
+  # defp reduce_num_split([str], _count), do: str
 
   defp match_numbers?(step_text) do
     String.match?(step_text, @number_regex)
