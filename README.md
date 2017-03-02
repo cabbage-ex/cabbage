@@ -109,6 +109,33 @@ end
 
 This provides the best of both worlds. Feature files for non-technical users, and an actual test file written in Elixir for developers that have to maintain them.
 
+# Developing
+
+## Using Docker Compose
+
+A `docker-compose.yml` is provided for running the tests in containers.
+
+```shell
+$ docker-compose up
+```
+
+To wipe all `_build` and `deps` you can run:
+```shell
+$ docker-compose down -v
+```
+
+If you want to interactive, using standard `mix` commands, such as updating dependencies:
+
+```shell
+$ docker-compose run --rm test deps.update --all
+```
+
+Or, if you want to run a single test, that can be accomplished with:
+
+```shell
+$ docker-compose run --rm cabbage test test/feature_test.exs
+```
+
 # Roadmap
 
 - [x] Scenarios
