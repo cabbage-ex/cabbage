@@ -23,7 +23,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "Given my name is "Miran""
 
-      defgiven ~r/^my name is "(?<string>[^"]+)"$/, vars, state do
+      defgiven ~r/^my name is "(?<string_1>[^"]+)"$/, vars, state do
         # Your implementation here
       end
     """
@@ -37,7 +37,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "Given my name is 'Miran'"
 
-      defgiven ~r/^my name is '(?<string>[^']+)'$/, vars, state do
+      defgiven ~r/^my name is '(?<string_1>[^']+)'$/, vars, state do
         # Your implementation here
       end
     """

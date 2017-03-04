@@ -44,10 +44,10 @@ defmodule MissingStepError do
   end
 
   defp convert_double_quote_strings(step_text) do
-    Regex.replace(@double_quote_regex, step_text, ~s/"(?<string>[^"]+)"/)
+    Regex.replace(@double_quote_regex, step_text, ~s/"(?<string_1>[^"]+)"/)
   end
 
   defp convert_single_quote_strings(step_text) do
-    Regex.replace(@single_quote_regex, step_text, ~s/'(?<string>[^']+)'/)
+    Regex.replace(@single_quote_regex, step_text, ~s/'(?<string_1>[^']+)'/)
   end
 end
