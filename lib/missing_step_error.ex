@@ -56,6 +56,14 @@ defmodule MissingStepError do
   end
 
   defp convert_single_quote_strings(step_text) do
-    Regex.replace(@single_quote_regex, step_text, ~s/'(?<string_1>[^']+)'/)
+    join_sqs_split(Regex.split(@single_quote_regex, step_text), 1, "")
+  end
+
+  defp join_sqs_split([], _count, acc), do: String.trim(acc)
+  defp join_sqs_split([head | []], count, acc) do
+    join_sqs_split([], count + 1, acc <> head)
+  end
+  defp join_sqs_split([head | tail], count, acc) do
+    join_sqs_split(tail, count + 1, acc <> head <> ~s/'(?<string_#{count}>[^']+)'/)
   end
 end

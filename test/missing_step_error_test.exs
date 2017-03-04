@@ -59,6 +59,21 @@ defmodule MissingStepAdvisorTest do
     assert_correct_message(step_text, step_type, expected_message)
   end
 
+  test "convert multiple single quote strings" do
+    step_text = "my favourite food & drink is 'Cheese' and 'Liquid Cheese'"
+    step_type = "And"
+    expected_message = """
+    Please add a matching step for:
+    "And my favourite food & drink is 'Cheese' and 'Liquid Cheese'"
+
+      defand ~r/^my favourite food & drink is '(?<string_1>[^']+)' and '(?<string_2>[^']+)'$/, vars, state do
+        # Your implementation here
+      end
+    """
+
+    assert_correct_message(step_text, step_type, expected_message)
+  end
+
   test "convert numbers to regex capture group in message" do
     step_text = "I am 49 years old"
     step_type = "And"
