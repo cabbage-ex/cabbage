@@ -30,6 +30,20 @@ defmodule MissingStepAdvisorTest do
     assert_correct_message(step_text, step_type, expected_message)
   end
 
+  test "convert multiple double quote strings" do
+    step_text = "my first name is \"Erol\" and my nickname is \"Hungry Homer\""
+    step_type = "Given"
+    expected_message = """
+    Please add a matching step for:
+    "Given my first name is "Erol" and my nickname is "Hungry Homer""
+
+      defgiven ~r/^my first name is "(?<string_1>[^"]+)" and my nickname is "(?<string_2>[^"]+)"$/, vars, state do
+        # Your implementation here
+      end
+    """
+    assert_correct_message(step_text, step_type, expected_message)
+  end
+
   test "convert single quote strings to regex capture group in message" do
     step_text = "my name is 'Miran'"
     step_type = "Given"

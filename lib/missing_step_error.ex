@@ -35,16 +35,24 @@ defmodule MissingStepError do
     join_num_split(Regex.split(@number_regex, step_text), 1, "")
   end
 
-  def join_num_split([], _count, acc), do: String.trim(acc)
-  def join_num_split([str1 | []], count, acc) do
-    join_num_split([], count + 1, acc <> str1)
+  defp join_num_split([], _count, acc), do: String.trim(acc)
+  defp join_num_split([head | []], count, acc) do
+    join_num_split([], count + 1, acc <> head)
   end
-  def join_num_split([str1 | tail], count, acc) do
-    join_num_split(tail, count + 1, acc <> str1 <> ~s/ (?<number_#{count}>\\d+) /)
+  defp join_num_split([head | tail], count, acc) do
+    join_num_split(tail, count + 1, acc <> head <> ~s/ (?<number_#{count}>\\d+) /)
   end
 
   defp convert_double_quote_strings(step_text) do
-    Regex.replace(@double_quote_regex, step_text, ~s/"(?<string_1>[^"]+)"/)
+    join_dqs_split(Regex.split(@double_quote_regex, step_text), 1, "")
+  end
+
+  defp join_dqs_split([], _count, acc), do: String.trim(acc)
+  defp join_dqs_split([head | []], count, acc) do
+    join_dqs_split([], count + 1, acc <> head)
+  end
+  defp join_dqs_split([head | tail], count, acc) do
+    join_dqs_split(tail, count + 1, acc <> head <> ~s/"(?<string_#{count}>[^"]+)"/)
   end
 
   defp convert_single_quote_strings(step_text) do
