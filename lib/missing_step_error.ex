@@ -32,38 +32,28 @@ defmodule MissingStepError do
   end
 
   defp convert_nums(step_text) do
-    join_num_split(Regex.split(@number_regex, step_text), 1, "")
-  end
-
-  defp join_num_split([], _count, acc), do: String.trim(acc)
-  defp join_num_split([head | []], count, acc) do
-    join_num_split([], count + 1, acc <> head)
-  end
-  defp join_num_split([head | tail], count, acc) do
-    join_num_split(tail, count + 1, acc <> head <> ~s/ (?<number_#{count}>\\d+) /)
+    join_regex_split(Regex.split(@number_regex, step_text), 1, &get_number_string(&1), "")
   end
 
   defp convert_double_quote_strings(step_text) do
-    join_dqs_split(Regex.split(@double_quote_regex, step_text), 1, "")
-  end
-
-  defp join_dqs_split([], _count, acc), do: String.trim(acc)
-  defp join_dqs_split([head | []], count, acc) do
-    join_dqs_split([], count + 1, acc <> head)
-  end
-  defp join_dqs_split([head | tail], count, acc) do
-    join_dqs_split(tail, count + 1, acc <> head <> ~s/"(?<string_#{count}>[^"]+)"/)
+    join_regex_split(Regex.split(@double_quote_regex, step_text), 1, &get_double_quote_string(&1), "")
   end
 
   defp convert_single_quote_strings(step_text) do
-    join_sqs_split(Regex.split(@single_quote_regex, step_text), 1, "")
+    join_regex_split(Regex.split(@single_quote_regex, step_text), 1, &get_single_quote_string(&1), "")
   end
 
-  defp join_sqs_split([], _count, acc), do: String.trim(acc)
-  defp join_sqs_split([head | []], count, acc) do
-    join_sqs_split([], count + 1, acc <> head)
+  defp join_regex_split([], _count, _get_string_fun, acc), do: String.trim(acc)
+
+  defp join_regex_split([head | []], count, get_string_fun, acc) do
+    join_regex_split([], count + 1, get_string_fun, acc <> head)
   end
-  defp join_sqs_split([head | tail], count, acc) do
-    join_sqs_split(tail, count + 1, acc <> head <> ~s/'(?<string_#{count}>[^']+)'/)
+
+  defp join_regex_split([head | tail], count, get_string_fun, acc) do
+    join_regex_split(tail, count + 1, get_string_fun, acc <> head <> get_string_fun.(count))
   end
+
+  defp get_number_string(count),       do: ~s/ (?<number_#{count}>\\d+) /
+  defp get_single_quote_string(count), do: ~s/'(?<string_#{count}>[^']+)'/
+  defp get_double_quote_string(count), do: ~s/"(?<string_#{count}>[^"]+)"/
 end
