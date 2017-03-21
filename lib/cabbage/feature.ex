@@ -206,7 +206,7 @@ defmodule Cabbage.Feature do
 
   defp compile({:{}, _, [regex, vars, state_pattern, block, metadata]}, step, step_type, scenario_name) do
     {regex, _} = Code.eval_quoted(regex)
-    named_vars = extract_named_vars(regex, step.text)
+    named_vars = extract_named_vars(regex, step.text) |> Map.merge(%{table: step.table_data, doc_string: step.doc_string})
     quote generated: true do
       with {_type, unquote(vars)} <- {:variables, unquote(Macro.escape(named_vars))},
            {_type, state = unquote(state_pattern)} <- {:state, Cabbage.Feature.Helpers.fetch_state(unquote(scenario_name), __MODULE__)}
