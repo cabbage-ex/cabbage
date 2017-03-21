@@ -111,7 +111,7 @@ This provides the best of both worlds. Feature files for non-technical users, an
 
 ### Tables & Doc Strings
 
-Using tables and Doc Strings can be done easily, they are provided through the variables under the names `:table` and `:doc_string`. An example can be seen in (test/data_tables_test.exs)[test/data_tables_test.exs] and (test/features/data_tables.feature)[test/features/data_tables.feature].
+Using tables and Doc Strings can be done easily, they are provided through the variables under the names `:table` and `:doc_string`. An example can be seen in [test/data_tables_test.exs](test/data_tables_test.exs) and [test/features/data_tables.feature](test/features/data_tables.feature).
 
 ### Running specific tests
 
