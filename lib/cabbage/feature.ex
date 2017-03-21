@@ -181,10 +181,11 @@ defmodule Cabbage.Feature do
             {:ok, Map.merge(context || %{}, Cabbage.Feature.Helpers.fetch_state(unquote(scenario.name), __MODULE__))}
           end
 
+          ExUnit.Case.register_test(unquote(Macro.escape(%{env | line: scenario.line})), :test, unquote(scenario.name), [])
           @tag :integration
-          test unquote(scenario.name), exunit_state do
+          def unquote(:"test Scenario #{scenario.name}")(exunit_state) do
             Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
-            Logger.info ["\t", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
+            Logger.info [IO.ANSI.color(61), "Line ", to_string(unquote(scenario.line)), ":  ", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
             unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))
           end
         end
