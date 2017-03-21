@@ -229,14 +229,7 @@ defmodule Cabbage.Feature do
   end
 
   defp compile(_, step, step_type, _scenario_name) do
-    raise """
-    Please add a matching step for:
-    "#{step_type} #{step.text}"
-
-      def#{step_type |> String.downcase} ~r/^#{step.text}$/, vars, state do
-        # Your implementation here
-      end
-    """
+    raise MissingStepError, [step_text: step.text, step_type: step_type]
   end
 
   defp find_implementation_of_step(step, steps) do
