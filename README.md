@@ -109,6 +109,10 @@ end
 
 This provides the best of both worlds. Feature files for non-technical users, and an actual test file written in Elixir for developers that have to maintain them.
 
+### Tables & Doc Strings
+
+Using tables and Doc Strings can be done easily, they are provided through the variables under the names `:table` and `:doc_string`. An example can be seen in (test/data_tables_test.exs)[test/data_tables_test.exs] and (test/features/data_tables.feature)[test/features/data_tables.feature].
+
 ### Running specific tests
 
 Typically to run an ExUnit test you would do something like `mix test test/some_test.exs:12` and elixir will automatically load  `test/some_test.exs` for you, but only run the test on line `12`. Since the feature files are being translated into ExUnit at compile time, you'll have to specify the `.exs` file and not the `.feature` file to run. The line numbers are printed out as each test runs (at the `:info` level, so you may need to increase your logger config if you dont see anything). An example is like as follows:
@@ -148,7 +152,8 @@ $ docker-compose run --rm cabbage test test/feature_test.exs
 - [x] Scenarios
 - [x] Scenario Outlines
 - [x] ExUnit Case Templates
-- [ ] Executing specific tests
+- [x] Data tables
+- [x] Executing specific tests
 - [x] Tags implementation
 - [ ] Background steps
 - [ ] Integration Helpers for Wallaby (separate project?)
