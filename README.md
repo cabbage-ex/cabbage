@@ -116,6 +116,33 @@ Typically to run an ExUnit test you would do something like `mix test test/some_
     # Runs scenario of test/features/coffee.feature on line 13 (because its the second scenario)
     mix test test/feature_test.exs:2
 
+# Developing
+
+## Using Docker Compose
+
+A `docker-compose.yml` is provided for running the tests in containers.
+
+```shell
+$ docker-compose up
+```
+
+To wipe all `_build` and `deps` you can run:
+```shell
+$ docker-compose down -v
+```
+
+If you want to interactive, using standard `mix` commands, such as updating dependencies:
+
+```shell
+$ docker-compose run --rm test deps.update --all
+```
+
+Or, if you want to run a single test, that can be accomplished with:
+
+```shell
+$ docker-compose run --rm cabbage test test/feature_test.exs
+```
+
 # Roadmap
 
 - [x] Scenarios

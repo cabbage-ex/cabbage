@@ -147,8 +147,8 @@ defmodule Cabbage.Feature do
   end
 
   defmacro expose_metadata(env) do
-    steps = Module.get_attribute(env.module, :steps)
-    tags = Module.get_attribute(env.module, :tags)
+    steps = Module.get_attribute(env.module, :steps) || []
+    tags = Module.get_attribute(env.module, :tags) || []
     quote generated: true do
       def raw_steps() do
         unquote(Macro.escape(steps))

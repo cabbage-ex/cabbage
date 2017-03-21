@@ -1,0 +1,19 @@
+version: "2"
+
+volumes:
+  build: ~
+  deps: ~
+
+services:
+  cabbage:
+    image: elixir:1.4
+    entrypoint: mix
+    command: do local.hex --force, deps.get, deps.compile, test --only integration
+    environment:
+      MIX_ENV: test
+    working_dir: /code
+    volumes:
+      - .:/code
+      - build:/code/_build
+      - deps:/code/deps
+
