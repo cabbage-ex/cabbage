@@ -32,16 +32,24 @@ defmodule MissingStepError do
   end
 
   defp convert_nums(step_text) do
-    join_regex_split(Regex.split(@number_regex, step_text), 1, &get_number_string(&1), "")
+    @number_regex
+    |> Regex.split(step_text)
+    |> join_regex_split(1, &get_number_string(&1))
   end
 
   defp convert_double_quote_strings(step_text) do
-    join_regex_split(Regex.split(@double_quote_regex, step_text), 1, &get_double_quote_string(&1), "")
+    @double_quote_regex
+    |> Regex.split(step_text)
+    |> join_regex_split(1, &get_double_quote_string(&1))
   end
 
   defp convert_single_quote_strings(step_text) do
-    join_regex_split(Regex.split(@single_quote_regex, step_text), 1, &get_single_quote_string(&1), "")
+    @single_quote_regex
+    |> Regex.split(step_text)
+    |> join_regex_split(1, &get_single_quote_string(&1))
   end
+
+  defp join_regex_split(matches, count, get_string_fun, acc \\ "")
 
   defp join_regex_split([], _count, _get_string_fun, acc), do: String.trim(acc)
 
