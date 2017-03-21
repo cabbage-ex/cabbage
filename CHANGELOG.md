@@ -1,5 +1,11 @@
 # Changelog
 
+### v0.3.0
+- Support for running specific tests #15 on a specific line number.
+- Bug fix #19 Thanks to @rawkode - Defaulting steps and tags to empty list when get_attributes returns nil
+- Missing step advisor improvements #14 Thanks to @shdblowers
+- Data tables and doc strings are now available in the variables under the `:table` and `:doc_string` keys
+
 ### v0.2.2
 - Support for ExUnit case templates. Simply specify the case template module name like
 `use Cabbage, template: MyApp.ConnCase, feature: "some_file.feature"`
