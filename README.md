@@ -24,6 +24,12 @@ end
 
 ## Example Usage
 
+By default, feature files are expected inside `test/features`. This can be configured within your application with the following:
+
+```elixir
+config :cabbage, features: "some/other/path/from/your/project/root"
+```
+
 Inside `test/features/coffee.feature` you might have something like:
 
 ```gherkin
@@ -43,8 +49,7 @@ To translate this to a simple exunit test, all you need to do is provide the tra
 
 ```elixir
 defmodule MyApp.Features.CoffeeTest do
-  # Base directory of features is configurable, assumes "test/features/" is prepended
-  # remaining options are passed directly to `ExUnit`
+  # Options, other than file:, are passed directly to `ExUnit`
   use Cabbage.Feature, async: false, file: "coffee.feature"
 
   # `setup_all/1` provides a callback for doing something before the entire suite runs
