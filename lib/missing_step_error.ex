@@ -13,19 +13,19 @@ defmodule MissingStepError do
   @double_quote_regex ~r/"[^"]+"/
 
   def exception(step_text: step_text, step_type: step_type) do
-    {converted_step_text, vars} =
+    {converted_step_text, list_of_vars} =
       {step_text, []}
       |> convert_nums()
       |> convert_double_quote_strings()
       |> convert_single_quote_strings()
 
-    converted_vars = vars_to_correct_format(vars)
+    map_of_vars = vars_to_correct_format(list_of_vars)
 
     message = """
     Please add a matching step for:
     "#{step_type} #{step_text}"
 
-      def#{step_type |> String.downcase} ~r/^#{converted_step_text}$/, #{converted_vars}, state do
+      def#{step_type |> String.downcase} ~r/^#{converted_step_text}$/, #{map_of_vars}, state do
         # Your implementation here
       end
     """
