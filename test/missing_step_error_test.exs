@@ -8,7 +8,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "Given I am Bob"
 
-      defgiven ~r/^I am Bob$/, vars, state do
+      defgiven ~r/^I am Bob$/, _vars, state do
         # Your implementation here
       end
     """
@@ -23,7 +23,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "Given my name is "Miran""
 
-      defgiven ~r/^my name is "(?<string_1>[^"]+)"$/, vars, state do
+      defgiven ~r/^my name is "(?<string_1>[^"]+)"$/, %{string_1: string_1}, state do
         # Your implementation here
       end
     """
@@ -37,7 +37,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "Given my first name is "Erol" and my nickname is "Hungry Homer""
 
-      defgiven ~r/^my first name is "(?<string_1>[^"]+)" and my nickname is "(?<string_2>[^"]+)"$/, vars, state do
+      defgiven ~r/^my first name is "(?<string_1>[^"]+)" and my nickname is "(?<string_2>[^"]+)"$/, %{string_1: string_1, string_2: string_2}, state do
         # Your implementation here
       end
     """
@@ -51,7 +51,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "Given my name is 'Miran'"
 
-      defgiven ~r/^my name is '(?<string_1>[^']+)'$/, vars, state do
+      defgiven ~r/^my name is '(?<string_1>[^']+)'$/, %{string_1: string_1}, state do
         # Your implementation here
       end
     """
@@ -66,7 +66,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "And my favourite food & drink is 'Cheese' and 'Liquid Cheese'"
 
-      defand ~r/^my favourite food & drink is '(?<string_1>[^']+)' and '(?<string_2>[^']+)'$/, vars, state do
+      defand ~r/^my favourite food & drink is '(?<string_1>[^']+)' and '(?<string_2>[^']+)'$/, %{string_1: string_1, string_2: string_2}, state do
         # Your implementation here
       end
     """
@@ -81,7 +81,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "And I am 49 years old"
 
-      defand ~r/^I am (?<number_1>\\d+) years old$/, vars, state do
+      defand ~r/^I am (?<number_1>\\d+) years old$/, %{number_1: number_1}, state do
         # Your implementation here
       end
     """
@@ -96,7 +96,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "When the 3rd number is 1101"
 
-      defwhen ~r/^the 3rd number is (?<number_1>\\d+)$/, vars, state do
+      defwhen ~r/^the 3rd number is (?<number_1>\\d+)$/, %{number_1: number_1}, state do
         # Your implementation here
       end
     """
@@ -111,7 +111,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "Given 29 is my favourite number"
 
-      defgiven ~r/^(?<number_1>\\d+) is my favourite number$/, vars, state do
+      defgiven ~r/^(?<number_1>\\d+) is my favourite number$/, %{number_1: number_1}, state do
         # Your implementation here
       end
     """
@@ -126,7 +126,7 @@ defmodule MissingStepAdvisorTest do
     Please add a matching step for:
     "And there are 3 on the left and 2 on the right"
 
-      defand ~r/^there are (?<number_1>\\d+) on the left and (?<number_2>\\d+) on the right$/, vars, state do
+      defand ~r/^there are (?<number_1>\\d+) on the left and (?<number_2>\\d+) on the right$/, %{number_1: number_1, number_2: number_2}, state do
         # Your implementation here
       end
     """

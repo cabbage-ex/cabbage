@@ -13,17 +13,19 @@ defmodule MissingStepError do
   @double_quote_regex ~r/"[^"]+"/
 
   def exception(step_text: step_text, step_type: step_type) do
-    converted_step_text =
-      step_text
+    {converted_step_text, vars} =
+      {step_text, []}
       |> convert_nums()
       |> convert_double_quote_strings()
       |> convert_single_quote_strings()
+
+    converted_vars = vars_to_correct_format(vars)
 
     message = """
     Please add a matching step for:
     "#{step_type} #{step_text}"
 
-      def#{step_type |> String.downcase} ~r/^#{converted_step_text}$/, vars, state do
+      def#{step_type |> String.downcase} ~r/^#{converted_step_text}$/, #{converted_vars}, state do
         # Your implementation here
       end
     """
@@ -31,34 +33,54 @@ defmodule MissingStepError do
     %__MODULE__{message: message}
   end
 
-  defp convert_nums(step_text) do
+  defp convert_nums({step_text, vars}) do
     @number_regex
     |> Regex.split(step_text)
-    |> join_regex_split(1, &get_number_string(&1))
+    |> join_regex_split(1, :number, {"", vars})
   end
 
-  defp convert_double_quote_strings(step_text) do
+  defp convert_double_quote_strings({step_text, vars}) do
     @double_quote_regex
     |> Regex.split(step_text)
-    |> join_regex_split(1, &get_double_quote_string(&1))
+    |> join_regex_split(1, :double_quote_string, {"", vars})
   end
 
-  defp convert_single_quote_strings(step_text) do
+  defp convert_single_quote_strings({step_text, vars}) do
     @single_quote_regex
     |> Regex.split(step_text)
-    |> join_regex_split(1, &get_single_quote_string(&1))
+    |> join_regex_split(1, :single_quote_string, {"", vars})
   end
 
-  defp join_regex_split(matches, count, get_string_fun, acc \\ "")
-
-  defp join_regex_split([], _count, _get_string_fun, acc), do: String.trim(acc)
-  defp join_regex_split([head | []], _count, _get_string_fun, acc), do: String.trim(acc <> head)
-
-  defp join_regex_split([head | tail], count, get_string_fun, acc) do
-    join_regex_split(tail, count + 1, get_string_fun, acc <> head <> get_string_fun.(count))
+  defp join_regex_split([], _count, _type, {acc, vars}) do
+    {String.trim(acc), vars}
   end
 
-  defp get_number_string(count),       do: ~s/ (?<number_#{count}>\\d+) /
-  defp get_single_quote_string(count), do: ~s/'(?<string_#{count}>[^']+)'/
-  defp get_double_quote_string(count), do: ~s/"(?<string_#{count}>[^"]+)"/
+  defp join_regex_split([head | []], _count, _type, {acc, vars}) do
+    {String.trim(acc <> head), vars}
+  end
+
+  defp join_regex_split([head | tail], count, type, {acc, vars}) do
+    step_text = acc <> head <> get_regex_capture_string(type, count)
+    vars = vars ++ [get_var_string(type, count)]
+
+    join_regex_split(tail, count + 1, type, {step_text, vars})
+  end
+
+  defp get_regex_capture_string(:number, count),              do: ~s/ (?<number_#{count}>\\d+) /
+  defp get_regex_capture_string(:single_quote_string, count), do: ~s/'(?<string_#{count}>[^']+)'/
+  defp get_regex_capture_string(:double_quote_string, count), do: ~s/"(?<string_#{count}>[^"]+)"/
+
+  defp get_var_string(:number, count), do: "number_#{count}"
+  defp get_var_string(:single_quote_string, count), do: "string_#{count}"
+  defp get_var_string(:double_quote_string, count), do: "string_#{count}"
+
+  defp vars_to_correct_format([]), do: "_vars"
+  defp vars_to_correct_format(vars) do
+    joined_vars =
+      vars
+      |> Enum.map(fn(var) -> "#{var}: #{var}" end)
+      |> Enum.join(", ")
+
+    "%{#{joined_vars}}"
+  end
 end
