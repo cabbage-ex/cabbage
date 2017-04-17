@@ -52,10 +52,7 @@ defmodule MissingStepError do
   defp join_regex_split(matches, count, get_string_fun, acc \\ "")
 
   defp join_regex_split([], _count, _get_string_fun, acc), do: String.trim(acc)
-
-  defp join_regex_split([head | []], count, get_string_fun, acc) do
-    join_regex_split([], count + 1, get_string_fun, acc <> head)
-  end
+  defp join_regex_split([head | []], _count, _get_string_fun, acc), do: String.trim(acc <> head)
 
   defp join_regex_split([head | tail], count, get_string_fun, acc) do
     join_regex_split(tail, count + 1, get_string_fun, acc <> head <> get_string_fun.(count))
