@@ -116,6 +116,8 @@ defmodule Cabbage.Feature do
 
         # Omitted the rest
       end
+
+  Keep in mind that if you'd like to be more explicit about what you bring into your test, you can use the macros `import_steps/1` and `import_tags/1`. This will allow you to be more selective about whats getting included into your integration tests. The `import_feature/1` macro simply calls both the `import_steps/1` and `import_tags/1` macros.
   """
   import Cabbage.Feature.Helpers
 
@@ -245,12 +247,37 @@ defmodule Cabbage.Feature do
     |> Enum.into(%{})
   end
 
+  @doc """
+  Brings in all the functionality available from the supplied module. Module must `use Cabbage.Feature` (with or without a `:file`).
+
+  Same as calling both `import_steps/1` and `import_tags/1`.
+  """
   defmacro import_feature(module) do
+    quote do
+      import_steps(unquote(module))
+      import_tags(unquote(module))
+    end
+  end
+
+  @doc """
+  Brings in all the step definitions from the supplied module. Module must `use Cabbage.Feature` (with or without a `:file`).
+  """
+  defmacro import_steps(module) do
     quote do
       if Code.ensure_compiled?(unquote(module)) do
         for step <- unquote(module).raw_steps() do
           Module.put_attribute(__MODULE__, :steps, step)
         end
+      end
+    end
+  end
+
+  @doc """
+  Brings in all the tag definitions from the supplied module. Module must `use Cabbage.Feature` (with or without a `:file`).
+  """
+  defmacro import_tags(module) do
+    quote do
+      if Code.ensure_compiled?(unquote(module)) do
         for {name, block} <- unquote(module).raw_tags() do
           Cabbage.Feature.Helpers.add_tag(__MODULE__, name, block)
         end
