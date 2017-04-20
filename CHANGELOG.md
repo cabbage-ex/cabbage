@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.3.1
+- Better support for missing steps (produces the pattern match for the given missing data). #26 Thanks to @shdblowers
+- Breaks `import_feature/1` into two separate macros for more explicit control. Issue #21. Thanks for @hisapy for the suggestion.
+
 ### v0.3.0
 - Support for running specific tests #15 on a specific line number.
 - Bug fix #19 Thanks to @rawkode - Defaulting steps and tags to empty list when get_attributes returns nil
