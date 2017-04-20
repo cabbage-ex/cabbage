@@ -247,10 +247,24 @@ defmodule Cabbage.Feature do
 
   defmacro import_feature(module) do
     quote do
+      import_steps(unquote(module))
+      import_tags(unquote(module))
+    end
+  end
+
+  defmacro import_steps(module) do
+    quote do
       if Code.ensure_compiled?(unquote(module)) do
         for step <- unquote(module).raw_steps() do
           Module.put_attribute(__MODULE__, :steps, step)
         end
+      end
+    end
+  end
+
+  defmacro import_tags(module) do
+    quote do
+      if Code.ensure_compiled?(unquote(module)) do
         for {name, block} <- unquote(module).raw_tags() do
           Cabbage.Feature.Helpers.add_tag(__MODULE__, name, block)
         end

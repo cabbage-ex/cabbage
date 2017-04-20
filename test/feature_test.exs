@@ -4,7 +4,7 @@ defmodule Cabbage.FeatureTest do
   doctest Cabbage.Feature
 
   import_feature Cabbage.GlobalFeatures
-  import_feature Cabbage.TaglessFeatures
+  import_steps Cabbage.TaglessFeatures
 
   test "has an @feature" do
     assert "Serve coffee" = @feature.name
