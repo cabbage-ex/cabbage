@@ -1,5 +1,8 @@
 # Changelog
 
+### v0.3.2
+- Fix for improper state tracking #33. Thanks to @lboekhorst
+
 ### v0.3.1
 - Better support for missing steps (produces the pattern match for the given missing data). #26 Thanks to @shdblowers
 - Breaks `import_feature/1` into two separate macros for more explicit control. Issue #21. Thanks for @hisapy for the suggestion.
