@@ -180,7 +180,7 @@ defmodule Cabbage.Feature do
                   Logger.warn "Cabbage: Ignoring tag @#{tag}!"
               end
             end
-            {:ok, Map.merge(context || %{}, Cabbage.Feature.Helpers.fetch_state(unquote(scenario.name), __MODULE__))}
+            {:ok, Map.merge(Cabbage.Feature.Helpers.fetch_state(unquote(scenario.name), __MODULE__), context || %{})}
           end
 
           ExUnit.Case.register_test(unquote(Macro.escape(%{env | line: scenario.line})), :test, unquote(scenario.name), [])
