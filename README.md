@@ -8,8 +8,6 @@
 
 A simple addon on top of [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) which provides compile time translation of `.feature` files to exunit tests. Big thanks to [@meadsteve](https://github.com/meadsteve) and the [White Bread](https://github.com/meadsteve/white-bread) project for a huge head start on this project.
 
-## NOTE: Basic features are available, but project is still under development!
-
 ## Installation
 
 [Available in Hex](https://hex.pm/packages/cabbage), the package can be installed as:
