@@ -165,9 +165,9 @@ defmodule Cabbage.Feature do
     scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
     tags = Module.get_attribute(env.module, :tags) || []
-    for scenario <- scenarios do
+    for {scenario, index} <- Enum.with_index(scenarios) do
       quote generated: true do
-        describe "Scenario" do
+        describe "Scenario #{unquote(index + 1)}" do
           @scenario unquote(Macro.escape(scenario))
           setup context do
             for tag <- unquote(scenario.tags) do
@@ -177,7 +177,7 @@ defmodule Cabbage.Feature do
                   state = Cabbage.Feature.Helpers.evaluate_tag_block(block)
                   Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, state)
                 _ ->
-                  Logger.warn "Cabbage: Ignoring tag @#{tag}!"
+                  nil # Nothing to do
               end
             end
             {:ok, Map.merge(Cabbage.Feature.Helpers.fetch_state(unquote(scenario.name), __MODULE__), context || %{})}
@@ -185,7 +185,10 @@ defmodule Cabbage.Feature do
 
           ExUnit.Case.register_test(unquote(Macro.escape(%{env | line: scenario.line})), :test, unquote(scenario.name), [])
           @tag :integration
-          def unquote(:"test Scenario #{scenario.name}")(exunit_state) do
+          for tag <- unquote(scenario.tags) do
+            Module.put_attribute(__MODULE__, String.to_atom(tag), true)
+          end
+          def unquote(:"test Scenario #{index + 1} #{scenario.name}")(exunit_state) do
             Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
             Logger.info [IO.ANSI.color(61), "Line ", to_string(unquote(scenario.line)), ":  ", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
             unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))

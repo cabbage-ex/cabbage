@@ -1,7 +1,7 @@
 defmodule Cabbage.ChangingStateTest do
   use Cabbage.Feature, async: true, file: "changing_state.feature"
 
-  setup context do
+  setup _context do
     {:ok, params: %{start: :state}}
   end
 
@@ -14,7 +14,7 @@ defmodule Cabbage.ChangingStateTest do
     {:ok, state}
   end
 
-  defwhen ~r/^I change the state$/, _vars, state do
+  defwhen ~r/^I change the state$/, _vars, _state do
     {:ok, %{params: %{new: :state}}}
   end
 
