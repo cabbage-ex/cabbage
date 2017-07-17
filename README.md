@@ -66,7 +66,7 @@ defmodule MyApp.Features.CoffeeTest do
     {:ok, %{machine: Machine.put_coffee(Machine.new, number)}}
   end
 
-  defand ~r/^And I have deposited £(?<number>\d+)$/, %{user: user, machine: machine}}, %{number: number} do
+  defand ~r/^And I have deposited £(?<number>\d+)$/, %{user: user, machine: machine}, %{number: number} do
     {:ok, %{machine: Machine.deposit(machine, user, number)}} # State is automatically merged so this won't erase `user`
   end
 
