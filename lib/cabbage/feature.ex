@@ -165,9 +165,9 @@ defmodule Cabbage.Feature do
     scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
     tags = Module.get_attribute(env.module, :tags) || []
-    for scenario <- scenarios do
+    for scenario <- scenarios, test_number <- 1..Kernel.length(scenarios) do
       quote generated: true do
-        describe "#{unquote scenario.name}" do
+        describe "#{unquote scenario.name} (#{unquote test_number})" do
           @scenario unquote(Macro.escape(scenario))
           setup context do
             for tag <- unquote(scenario.tags) do
@@ -185,7 +185,7 @@ defmodule Cabbage.Feature do
 
           ExUnit.Case.register_test(unquote(Macro.escape(%{env | line: scenario.line})), :test, unquote(scenario.name), [])
           @tag :integration
-          def unquote(:"test #{scenario.name} #{scenario.name}")(exunit_state) do
+          def unquote(:"test #{scenario.name} (#{test_number}) #{scenario.name}")(exunit_state) do
             Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
             Logger.info [IO.ANSI.color(61), "Line ", to_string(unquote(scenario.line)), ":  ", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
             unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))
