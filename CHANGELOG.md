@@ -1,5 +1,8 @@
 # Changelog
 
+### v0.3.3
+- Support for Elixir 1.5 #38. Thanks to @lboekhorst and @rawkode
+
 ### v0.3.2
 - Fix for improper state tracking #33. Thanks to @lboekhorst
 
