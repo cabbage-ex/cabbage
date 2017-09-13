@@ -165,9 +165,12 @@ defmodule Cabbage.Feature do
     scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
     tags = Module.get_attribute(env.module, :tags) || []
-    for scenario <- scenarios, test_number <- 1..Kernel.length(scenarios) do
+    test_number = 0
+
+
+    Enum.with_index(scenarios) |> Enum.each(fn {scenario, test_number} ->
       quote generated: true do
-        describe "#{unquote scenario.name} (#{unquote test_number})" do
+        describe "#{unquote test_number}. #{unquote scenario.name}" do
           @scenario unquote(Macro.escape(scenario))
           setup context do
             for tag <- unquote(scenario.tags) do
