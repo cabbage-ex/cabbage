@@ -168,7 +168,7 @@ defmodule Cabbage.Feature do
     test_number = 0
 
 
-    Enum.with_index(scenarios) |> Enum.each(fn {scenario, test_number} ->
+    Enum.with_index(scenarios) |> Enum.each fn {scenario, test_number} ->
       quote generated: true do
         describe "#{unquote test_number}. #{unquote scenario.name}" do
           @scenario unquote(Macro.escape(scenario))
