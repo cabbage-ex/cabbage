@@ -165,9 +165,10 @@ defmodule Cabbage.Feature do
     scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
     tags = Module.get_attribute(env.module, :tags) || []
-    for {scenario, index} <- Enum.with_index(scenarios) do
+
+    Enum.with_index(scenarios) |> Enum.each(fn {scenario, test_number} ->
       quote generated: true do
-        describe "Scenario #{unquote(index + 1)}" do
+        describe "#{unquote test_number}. #{unquote scenario.name}" do
           @scenario unquote(Macro.escape(scenario))
           setup context do
             for tag <- unquote(scenario.tags) do
@@ -188,14 +189,14 @@ defmodule Cabbage.Feature do
           for tag <- unquote(scenario.tags) do
             Module.put_attribute(__MODULE__, String.to_atom(tag), true)
           end
-          def unquote(:"test Scenario #{index + 1} #{scenario.name}")(exunit_state) do
+          def unquote(:"test #{scenario.name} (#{test_number}) #{scenario.name}")(exunit_state) do
             Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
             Logger.info [IO.ANSI.color(61), "Line ", to_string(unquote(scenario.line)), ":  ", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
             unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))
           end
         end
       end
-    end
+    end)
   end
 
   def compile_step(step, steps, scenario_name) when is_list(steps) do

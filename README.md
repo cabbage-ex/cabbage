@@ -56,27 +56,27 @@ defmodule MyApp.Features.CoffeeTest do
     on_exit fn -> # Do something when the scenario is done
       IO.puts "Scenario completed, cleanup stuff"
     end
-    {:ok, %{my_starting: :state, user: %User{}}} # Return some beginning state
+    %{my_starting: :state, user: %User{}} # Return some beginning state
   end
 
   # All `defgiven/4`, `defand/4`, `defwhen/4` and `defthen/4` takes a regex, matched data, state and lastly a block
-  defgiven ~r/^there (is|are) (?<number>\d+) coffee(s) left in the machine$/, %{user: user}, %{number: number} do
+  defgiven ~r/^there (is|are) (?<number>\d+) coffee(s) left in the machine$/, %{number: number}, %{user: user} do
     # `{:ok, state}` gets returned from each callback which updates the state or
     # leaves the state unchanged when something else is returned
     {:ok, %{machine: Machine.put_coffee(Machine.new, number)}}
   end
 
-  defand ~r/^And I have deposited £(?<number>\d+)$/, %{user: user, machine: machine}}, %{number: number} do
+  defand ~r/^I have deposited £(?<number>\d+)$/, %{number: number}, %{user: user, machine: machine} do
     {:ok, %{machine: Machine.deposit(machine, user, number)}} # State is automatically merged so this won't erase `user`
   end
 
   # With no matches, the map is empty. Since state is unchanged, its not necessary to return it
-  defwhen ~r/^I press the coffee button$/, state, %{} do
+  defwhen ~r/^I press the coffee button$/, _, state do
     Machine.press_coffee(state.machine) # instead would be some `hound` or `wallaby` dsl
   end
 
   # Since state is unchanged, its not necessary to return it
-  defthen ~r/^I should be served a coffee$/, state, _ do
+  defthen ~r/^I should be served a coffee$/, _, state do
     assert %Coffee{} = Machine.take_drink(state.machine) # Make your `assert`ions in `defthen/4`s and `defand/4`s
   end
 end
