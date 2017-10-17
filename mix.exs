@@ -46,8 +46,8 @@ defmodule Cabbage.Mixfile do
   defp deps do
     [
       {:gherkin, "~> 1.4"},
-      {:ex_doc, "~> 0.10", only: :dev},
-      {:earmark, "~> 0.1", only: :dev}
+      {:ex_doc, "~> 0.18", only: :dev},
+      {:earmark, "~> 1.2", only: :dev}
     ]
   end
 
