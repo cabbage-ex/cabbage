@@ -166,8 +166,8 @@ defmodule Cabbage.Feature do
     steps = Module.get_attribute(env.module, :steps) || []
     tags = Module.get_attribute(env.module, :tags) || []
 
-    Enum.with_index(scenarios) |> Enum.each(fn {scenario, test_number} ->
-      quote generated: true do
+    Enum.with_index(scenarios) |> Enum.map(fn {scenario, test_number} ->
+      quote do
         describe "#{unquote test_number}. #{unquote scenario.name}" do
           @scenario unquote(Macro.escape(scenario))
           setup context do
@@ -184,12 +184,12 @@ defmodule Cabbage.Feature do
             {:ok, Map.merge(Cabbage.Feature.Helpers.fetch_state(unquote(scenario.name), __MODULE__), context || %{})}
           end
 
-          ExUnit.Case.register_test(unquote(Macro.escape(%{env | line: scenario.line})), :test, unquote(scenario.name), [])
+          ExUnit.Case.register_test(unquote(Macro.escape(%{env | line: scenario.line})), :test, :cabbage_test, [])
           @tag :integration
           for tag <- unquote(scenario.tags) do
             Module.put_attribute(__MODULE__, String.to_atom(tag), true)
           end
-          def unquote(:"test #{scenario.name} (#{test_number}) #{scenario.name}")(exunit_state) do
+          def unquote(:"test #{test_number}. #{scenario.name} cabbage_test")(exunit_state) do
             Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
             Logger.info [IO.ANSI.color(61), "Line ", to_string(unquote(scenario.line)), ":  ", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]
             unquote Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name))
