@@ -5,11 +5,15 @@ defmodule Cabbage.TagsTest do
     {:ok, %{tag: tag}}
   end
 
-  defwhen ~r/^run mix test --only wip some_test.exs$/, _vars, _state do
+  defwhen ~r/^run mix test( --only wip some_test.exs)?$/, _vars, _state do
     # Nothing to do here, cannot replicate
   end
 
   defthen ~r/^this test should be marked with that tag$/, _vars, %{tag: _tag} do
     assert %ExUnit.Test{tags: %{wip: true}} = @ex_unit_tests |> hd()
+  end
+
+  defthen ~r/^this test should be skipped and never run$/, _vars, state do
+    assert false
   end
 end
