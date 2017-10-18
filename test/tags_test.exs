@@ -6,10 +6,10 @@ defmodule Cabbage.TagsTest do
   end
 
   defwhen ~r/^run mix test --only wip some_test.exs$/, _vars, _state do
-    # Nothing to do here
+    # Nothing to do here, cannot replicate
   end
 
   defthen ~r/^this test should be marked with that tag$/, _vars, %{tag: _tag} do
-    # unable to do: Module.get_attribute(__MODULE__, String.to_atom(tag))
+    assert %ExUnit.Test{tags: %{wip: true}} = @ex_unit_tests |> hd()
   end
 end

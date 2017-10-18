@@ -12,7 +12,4 @@ defmodule Cabbage.ChangingNamesTest do
   defthen ~r/^my name is "(?<name>[^"]+)"$/, %{name: name}, %{username: username} do
     assert username == name
   end
-
-
-
 end
