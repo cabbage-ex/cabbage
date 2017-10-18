@@ -9,11 +9,19 @@ defmodule Cabbage.TagsTest do
     # Nothing to do here, cannot replicate
   end
 
+  defwhen ~r/^it takes longer than the timeout$/, _vars, _state do
+    Process.sleep(0) # Change to 1500 to test
+  end
+
+  defthen ~r/^the test fails$/, _vars, _state do
+    assert :ok # Not able to test
+  end
+
   defthen ~r/^this test should be marked with that tag$/, _vars, %{tag: _tag} do
     assert %ExUnit.Test{tags: %{wip: true}} = @ex_unit_tests |> hd()
   end
 
-  defthen ~r/^this test should be skipped and never run$/, _vars, state do
+  defthen ~r/^this test should be skipped and never run$/, _vars, _state do
     assert false
   end
 end

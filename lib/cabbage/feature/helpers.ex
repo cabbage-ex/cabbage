@@ -65,4 +65,25 @@ defmodule Cabbage.Feature.Helpers do
     |> Agent.update(fun)
   end
 
+  def run_tag(tags, tag, module, scenario_name) do
+    string_tag = to_string(tag)
+    case Enum.find(tags, &(match?({^string_tag, _}, &1))) do
+      {^string_tag, block} ->
+        Logger.debug "Cabbage: Running tag @#{tag}..."
+        state = evaluate_tag_block(block)
+        start_state(scenario_name, module, state)
+      _ ->
+        nil # Nothing to do
+    end
+  end
+
+  def map_tags(tags) do
+    tags
+    |> Enum.map(fn
+      {tag, value} ->
+        [{tag, value}]
+      tag ->
+        tag
+    end)
+  end
 end
