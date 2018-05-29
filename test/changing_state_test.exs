@@ -14,7 +14,7 @@ defmodule Cabbage.ChangingStateTest do
     {:ok, state}
   end
 
-  defwhen ~r/^I change the state$/, _vars, state do
+  defwhen ~r/^I change the state$/, _vars, _state do
     {:ok, %{params: %{new: :state}}}
   end
 
