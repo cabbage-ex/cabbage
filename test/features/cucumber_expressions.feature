@@ -3,7 +3,10 @@ Feature: Support cucumber expressions
   I want to support Cucumber Expressions
   So I can specify data type inside a step definition
 
-  Scenario: Cucumber Expression in step definition
-    Given Step definition using string as first parameter
-    When I run the test file
-    Then I should see it passing
+  Scenario: Cucumber Expression as first parameter in step definitions
+    Given Step definition using 1 int
+    And 1.0 float
+    And one word
+    And "one simple" string
+    When I check type of named captures
+    Then Named captures are of expected type
