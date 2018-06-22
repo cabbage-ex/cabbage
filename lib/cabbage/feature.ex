@@ -208,7 +208,10 @@ defmodule Cabbage.Feature do
   end
 
   defp compile({:{}, _, [expression, vars, state_pattern, block, metadata]}, step, step_type, scenario_name) do
-    named_vars = extract_named_vars(expression, step.text) |> Map.merge(%{table: step.table_data, doc_string: step.doc_string})
+    named_vars =
+      expression
+      |> extract_named_vars(step.text)
+      |> Map.merge(%{table: step.table_data, doc_string: step.doc_string})
 
     quote generated: true do
       with {_type, unquote(vars)} <- {:variables, unquote(Macro.escape(named_vars))},
