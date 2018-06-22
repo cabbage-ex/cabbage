@@ -7,38 +7,44 @@ defmodule Cabbage.Feature.CucumberExpression do
 
   alias Cabbage.Feature.{Parameter, ParameterType}
 
-  @spec to_regex(String.t()) :: Regex.t()
-  def to_regex(expression) do
+  @spec to_regex_string(String.t()) :: String.t()
+  def to_regex_string(expression) do
     expression
     |> split_into_terms
-    |> try_convert_terms_to_regex_patterns
-    |> combine_terms_and_regex_patterns
+    |> determine_parameters
+    |> convert_parameters_to_regex_patterns
+    |> stringify
   end
 
   defp split_into_terms(expression) do
     String.split(expression)
   end
 
-  defp try_convert_terms_to_regex_patterns(terms) do
-    Enum.map(terms, &try_convert_term_to_regex_pattern/1)
+  defp determine_parameters(terms) do
+    Enum.map(terms, fn(term) ->
+      case Parameter.extract(term) do
+        nil -> term
+        parameter -> parameter
+      end
+    end)
   end
 
-  defp try_convert_term_to_regex_pattern(term) do
-    case Parameter.extract(term) do
-      nil -> term
-      parameter -> Parameter.to_regex(parameter)
-    end
+  defp convert_parameters_to_regex_patterns(term_or_parameters) do
+    Enum.map(term_or_parameters, fn
+      %Parameter{} = parameter -> Parameter.to_regex(parameter)
+      term -> term
+    end)
   end
 
-  defp combine_terms_and_regex_patterns(term_or_regex_patterns) do
+  defp stringify(term_or_regex_patterns) do
     expression =
       term_or_regex_patterns
       |> Enum.map(&stringify_term_or_regex_pattern/1)
       |> Enum.join(" ")
 
-    ~r/^#{expression}$/
+    "^" <> expression <> "$"
   end
 
   defp stringify_term_or_regex_pattern(%Regex{} = regex), do: Regex.source(regex)
-  defp stringify_term_or_regex_pattern(term), do: term
+  defp stringify_term_or_regex_pattern(term) when is_binary(term), do: term
 end

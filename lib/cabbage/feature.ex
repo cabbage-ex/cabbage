@@ -207,12 +207,9 @@ defmodule Cabbage.Feature do
     |> compile(step, step_type, scenario_name)
   end
 
-  defp compile({:{}, _, [expression, vars, state_pattern, block, metadata]}, step, step_type, scenario_name) do
-    named_vars =
-      expression
-      |> extract_named_vars(step.text)
-      |> Map.merge(%{table: step.table_data, doc_string: step.doc_string})
-
+  defp compile({:{}, _, [regex, vars, state_pattern, block, metadata]}, step, step_type, scenario_name) do
+    {regex, _} = Code.eval_quoted(regex)
+    named_vars = extract_named_vars(regex, step.text) |> Map.merge(%{table: step.table_data, doc_string: step.doc_string})
     quote generated: true do
       with {_type, unquote(vars)} <- {:variables, unquote(Macro.escape(named_vars))},
            {_type, state = unquote(state_pattern)} <- {:state, Cabbage.Feature.Helpers.fetch_state(unquote(scenario_name), __MODULE__)}
@@ -239,12 +236,13 @@ defmodule Cabbage.Feature do
   end
 
   defp find_implementation_of_step(step, steps) do
-    Enum.find(steps, &Cabbage.Feature.CucumberExpressions.implemented?(step.text, &1))
+    Enum.find(steps, fn ({:{}, _, [r, _, _, _, _]}) ->
+      step.text =~ r |> Code.eval_quoted() |> elem(0)
+    end)
   end
 
-  defp extract_named_vars(expression, step_text) do
-    expression
-    |> Cabbage.Feature.CucumberExpressions.to_regex()
+  defp extract_named_vars(regex, step_text) do
+    regex
     |> Regex.named_captures(step_text)
     |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
     |> Enum.into(%{})

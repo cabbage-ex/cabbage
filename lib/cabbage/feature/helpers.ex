@@ -2,11 +2,19 @@ defmodule Cabbage.Feature.Helpers do
   @moduledoc false
   require Logger
 
-  def add_step(module, regex, vars, state, block, metadata) do
+  def add_step(module, string_or_regex, vars, state, block, metadata) do
     steps = Module.get_attribute(module, :steps) || []
+    regex = to_regex_ast(string_or_regex)
+
     Module.put_attribute(module, :steps, [{:{}, [], [regex, vars, state, block, metadata]} | steps])
     quote(do: nil)
   end
+
+  defp to_regex_ast(term) when is_binary(term) do
+    regex_string = Cabbage.Feature.CucumberExpression.to_regex_string(term)
+    Code.string_to_quoted!("~r/#{regex_string}/")
+  end
+  defp to_regex_ast(term), do: term
 
   def add_tag(module, "@" <> tag_name, block), do: add_tag(module, tag_name, block)
   def add_tag(module, tag_name, block) do
