@@ -10,8 +10,8 @@ defmodule Cabbage.Feature.Parameter do
 
   @type t :: %__MODULE__{}
 
-  @spec extract(String.t()) :: t() | nil
-  def extract(term) do
+  @spec convert(String.t()) :: t() | String.t
+  def convert(term) do
     parameter_format = ~r/\{(?<name>.*):(?<type>.*)\}/u
 
     case Regex.named_captures(parameter_format, term) do
@@ -20,7 +20,7 @@ defmodule Cabbage.Feature.Parameter do
         struct(__MODULE__, type_regex: regex, capture_name: capture_name)
 
       _ ->
-        nil
+        term
     end
   end
 

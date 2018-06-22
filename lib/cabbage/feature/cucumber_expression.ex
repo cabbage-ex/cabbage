@@ -20,12 +20,7 @@ defmodule Cabbage.Feature.CucumberExpression do
   end
 
   defp determine_parameters(terms) do
-    Enum.map(terms, fn(term) ->
-      case Parameter.extract(term) do
-        nil -> term
-        parameter -> parameter
-      end
-    end)
+    Enum.map(terms, &Parameter.convert/1)
   end
 
   defp convert_parameters_to_regex_patterns(term_or_parameters) do
