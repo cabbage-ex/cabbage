@@ -1,5 +1,5 @@
 defmodule Cabbage.Feature.CucumberExpressionTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   alias Cabbage.Feature.CucumberExpression
 
   describe "converting cucumber expressions to regex" do
