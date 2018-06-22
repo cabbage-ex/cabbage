@@ -1,12 +1,19 @@
 defmodule Cabbage.Feature.ParameterType do
-  defstruct [:name, :regex]
+  @moduledoc """
+  Function to provide the regular expression for a type used in a Cucumber expression.
+  """
 
-  def get_parameter_types do
-    [
-      %__MODULE__{name: "int", regex: "(?<{capture_name}>\\d+)"},
-      %__MODULE__{name: "float", regex: "(?<{capture_name}>\\d+\\.\\d+)"},
-      %__MODULE__{name: "word", regex: "(?<{capture_name}>\\w*\\S)"},
-      %__MODULE__{name: "string", regex: "(?<{capture_name}>\"(.*)\")"}
-    ]
+  @spec regex_for(String.t()) :: Regex.t()
+  def regex_for(type) do
+    Map.get(parameter_types(), type)
+  end
+
+  defp parameter_types do
+    %{
+      "int" => ~r/\d+/,
+      "float" => ~r/\d+\.\d+/,
+      "word" => ~r/\w*\S/,
+      "string" => ~r/"(.*)"/
+    }
   end
 end

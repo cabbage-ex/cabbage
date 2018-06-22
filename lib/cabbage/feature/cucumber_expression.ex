@@ -5,41 +5,40 @@ defmodule Cabbage.Feature.CucumberExpression do
   Supported types are `int`, `float`, `word`, `string`.
   """
 
-  alias Cabbage.Feature.ParameterType
+  alias Cabbage.Feature.{Parameter, ParameterType}
 
-  @spec to_regex(String.t) :: Regex.t
+  @spec to_regex(String.t()) :: Regex.t()
   def to_regex(expression) do
-    updated_expression =
-      expression
-      |> String.split
-      |> Enum.reduce("", &replace/2)
-      |> String.trim
-
-    ~r/^#{updated_expression}$/
+    expression
+    |> split_into_terms
+    |> try_convert_terms_to_regex_patterns
+    |> combine_terms_and_regex_patterns
   end
 
-  defp replace(token, acc) do
-    token
-    |> String.split(":")
-    |> do_replace(acc)
+  defp split_into_terms(expression) do
+    String.split(expression)
   end
 
-  defp do_replace(["{" <> capture_name, type], acc) do
-    param_type =
-      type
-      |> String.trim_trailing("}")
-      |> find_param_type
-
-    updated_expression = Regex.replace(~r/{capture_name}/, param_type.regex, capture_name)
-    "#{acc} #{updated_expression}"
+  defp try_convert_terms_to_regex_patterns(terms) do
+    Enum.map(terms, &try_convert_term_to_regex_pattern/1)
   end
 
-  defp do_replace(token, acc) do
-    "#{acc} #{token}"
+  defp try_convert_term_to_regex_pattern(term) do
+    case Parameter.extract(term) do
+      nil -> term
+      parameter -> Parameter.to_regex(parameter)
+    end
   end
 
-  defp find_param_type(type) do
-    ParameterType.get_parameter_types()
-    |> Enum.find(fn(param_type) -> param_type.name == type end)
+  defp combine_terms_and_regex_patterns(term_or_regex_patterns) do
+    expression =
+      term_or_regex_patterns
+      |> Enum.map(&stringify_term_or_regex_pattern/1)
+      |> Enum.join(" ")
+
+    ~r/^#{expression}$/
   end
+
+  defp stringify_term_or_regex_pattern(%Regex{} = regex), do: Regex.source(regex)
+  defp stringify_term_or_regex_pattern(term), do: term
 end
