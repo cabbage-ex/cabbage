@@ -47,7 +47,8 @@ defmodule Cabbage.Mixfile do
     [
       {:gherkin, "~> 1.4"},
       {:ex_doc, "~> 0.18", only: :dev},
-      {:earmark, "~> 1.2", only: :dev}
+      {:earmark, "~> 1.2", only: :dev},
+      {:mix_test_watch, "~> 0.5", only: :dev, runtime: false}
     ]
   end
 
