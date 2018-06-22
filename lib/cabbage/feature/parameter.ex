@@ -1,4 +1,9 @@
 defmodule Cabbage.Feature.Parameter do
+  @moduledoc false
+  # Functions for extracting parameters out of a cucumber expressions and converting
+  # those to regular expressions. A parameter is in the form of "{capture_name:type}".
+  # The supported types are defined in `ParameterType`.
+
   defstruct [:type_regex, :capture_name]
 
   alias Cabbage.Feature.ParameterType

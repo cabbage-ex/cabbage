@@ -1,9 +1,8 @@
 defmodule Cabbage.Feature.ParameterType do
-  @moduledoc """
-  Function to provide the regular expression that maps to a type used in a Cucumber expression.
-  For instance, in the cucumber expression `Given I have {count:int} rows`, the parameter
-  `count` is of type `int`.
-  """
+  @moduledoc false
+  # Function to provide the regular expression that maps to a type used in a Cucumber expression.
+  # For instance, in the cucumber expression `Given I have {count:int} rows`, the parameter
+  # `count` is of type `int`.
 
   @spec regex_for(String.t()) :: Regex.t()
   def regex_for(type) do
