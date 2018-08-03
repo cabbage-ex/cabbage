@@ -3,8 +3,7 @@ defmodule Cabbage.Feature.Helpers do
   require Logger
 
   def add_step(module, regex, vars, state, block, metadata) do
-    steps = Module.get_attribute(module, :steps) || []
-    Module.put_attribute(module, :steps, [{:{}, [], [regex, vars, state, block, metadata]} | steps])
+    Module.put_attribute(module, :steps, {:{}, [], [regex, vars, state, block, metadata]})
     quote(do: nil)
   end
 
