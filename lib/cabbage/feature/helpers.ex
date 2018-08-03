@@ -9,8 +9,7 @@ defmodule Cabbage.Feature.Helpers do
 
   def add_tag(module, "@" <> tag_name, block), do: add_tag(module, tag_name, block)
   def add_tag(module, tag_name, block) do
-    tags = Module.get_attribute(module, :tags) || []
-    Module.put_attribute(module, :tags, [{tag_name, block} | tags])
+    Module.put_attribute(module, :tags, {tag_name, block})
     quote(do: nil)
   end
 

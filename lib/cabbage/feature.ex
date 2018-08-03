@@ -127,7 +127,7 @@ defmodule Cabbage.Feature do
     is_feature = !match?(nil, opts[:file])
 
     Module.register_attribute(__CALLER__.module, :steps, accumulate: true)
-    Module.register_attribute(__CALLER__.module, :tags, [])
+    Module.register_attribute(__CALLER__.module, :tags, accumulate: true)
 
     quote do
       unquote(if is_feature do
