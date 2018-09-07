@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.3.4-dev
+
+- Support for Elixir 1.7 #50.
+
 ### v0.3.3
 - Support for Elixir 1.5 #38. Thanks to @lboekhorst and @rawkode
 

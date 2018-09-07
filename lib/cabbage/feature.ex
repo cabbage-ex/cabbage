@@ -125,6 +125,10 @@ defmodule Cabbage.Feature do
   defmacro __using__(opts) do
     {opts, exunit_opts} = Keyword.split(opts, @feature_opts)
     is_feature = !match?(nil, opts[:file])
+
+    Module.register_attribute(__CALLER__.module, :steps, accumulate: true)
+    Module.register_attribute(__CALLER__.module, :tags, accumulate: true)
+
     quote do
       unquote(if is_feature do
         quote do
@@ -135,9 +139,6 @@ defmodule Cabbage.Feature do
       @before_compile {unquote(__MODULE__), :expose_metadata}
       import unquote(__MODULE__)
       require Logger
-
-      Module.register_attribute(__MODULE__, :steps, accumulate: true)
-      Module.register_attribute(__MODULE__, :tags, [])
 
       unquote(if is_feature do
         quote do
