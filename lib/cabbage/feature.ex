@@ -168,25 +168,24 @@ defmodule Cabbage.Feature do
     tags = Module.get_attribute(env.module, :tags) || []
 
     Enum.with_index(scenarios) |> Enum.map(fn {scenario, test_number} ->
-      quote generated: true do
+      quote do
         describe "#{unquote test_number}. #{unquote scenario.name}" do
           @scenario unquote(Macro.escape(scenario))
           setup context do
             for tag <- unquote(scenario.tags) do
-              case Enum.find(unquote(Macro.escape(tags)), &(match?({^tag, _}, &1))) do
-                {^tag, block} ->
-                  Logger.debug "Cabbage: Running tag @#{tag}..."
-                  state = Cabbage.Feature.Helpers.evaluate_tag_block(block)
-                  Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, state)
-                _ ->
-                  Logger.warn "Cabbage: Ignoring tag @#{tag}!"
+              case tag do
+                {tag, _value} ->
+                  Cabbage.Feature.Helpers.run_tag(unquote(Macro.escape(tags)), tag, unquote(env.module), unquote(scenario.name))
+                tag ->
+                  Cabbage.Feature.Helpers.run_tag(unquote(Macro.escape(tags)), tag, unquote(env.module), unquote(scenario.name))
               end
             end
             {:ok, Map.merge(Cabbage.Feature.Helpers.fetch_state(unquote(scenario.name), __MODULE__), context || %{})}
           end
 
-          ExUnit.Case.register_test(unquote(Macro.escape(%{env | line: scenario.line})), :test, :cabbage_test, [])
           @tag :integration
+          tags = unquote(Macro.escape(map_tags(scenario.tags))) || []
+          ExUnit.Case.register_test(unquote(Macro.escape(%{env | line: scenario.line})), :test, :cabbage_test, tags)
           def unquote(:"test #{test_number}. #{scenario.name} cabbage_test")(exunit_state) do
             Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
             Logger.info [IO.ANSI.color(61), "Line ", to_string(unquote(scenario.line)), ":  ", IO.ANSI.magenta, "Scenario: ", IO.ANSI.yellow, unquote(scenario.name)]

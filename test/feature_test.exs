@@ -28,5 +28,4 @@ defmodule Cabbage.FeatureTest do
     assert coffees - 1 < 0
     {:ok, %{coffees: coffees - 1}}
   end
-
 end

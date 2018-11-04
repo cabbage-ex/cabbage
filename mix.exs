@@ -9,9 +9,9 @@ defmodule Cabbage.Mixfile do
       elixir: "~> 1.3",
       source_url: "git@github.com:cabbage-ex/cabbage.git",
       homepage_url: "https://github.com/cabbage-ex/cabbage",
-      elixirc_paths: elixirc_paths(Mix.env),
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       description: "Story BDD tool for executing elixir in ExUnit",
       docs: [
         main: Cabbage,
@@ -32,7 +32,7 @@ defmodule Cabbage.Mixfile do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_),     do: ["lib"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Dependencies can be Hex packages:
   #
@@ -45,7 +45,7 @@ defmodule Cabbage.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:gherkin, "~> 1.4"},
+      {:gherkin, "~> 1.6"},
       {:ex_doc, "~> 0.19", only: :dev},
       {:earmark, "~> 1.2", only: :dev}
     ]
@@ -60,12 +60,11 @@ defmodule Cabbage.Mixfile do
   end
 
   defp aliases do
-    [publish: ["hex.publish", "hex.publish docs", "tag"],
-     tag: &tag_release/1]
+    [publish: ["hex.publish", "hex.publish docs", "tag"], tag: &tag_release/1]
   end
 
   defp tag_release(_) do
-    Mix.shell.info "Tagging release as #{@version}"
+    Mix.shell().info("Tagging release as #{@version}")
     System.cmd("git", ["tag", "-a", "v#{@version}", "-m", "v#{@version}"])
     System.cmd("git", ["push", "--tags"])
   end
