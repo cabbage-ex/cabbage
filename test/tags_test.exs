@@ -1,5 +1,5 @@
 defmodule Cabbage.TagsTest do
-  use Cabbage.Feature, file: "tags.feature", async: false
+  use Cabbage.Feature, file: "tags.feature", async: false, tags: :feature_integration_test
 
   defgiven ~r/^a scenario is tagged as "(?<tag>[^"]+)"$/, %{tag: tag}, _state do
     {:ok, %{tag: tag}}
@@ -8,6 +8,12 @@ defmodule Cabbage.TagsTest do
   defgiven ~r/^global tag is set to "(?<global_tags>[^"]+)"$/, %{global_tags: global_tags}, _state do
     Application.put_env(:cabbage, :global_tags, global_tags)
     {:ok, %{tag: global_tags}}
+  end
+
+  defgiven ~r/^feature test file has provided tag "(?<integration_tags>[^"]+)"$/,
+           %{integration_tags: integration_tags},
+           _state do
+    {:ok, %{tag: integration_tags}}
   end
 
   defwhen ~r/^run mix test( --only wip some_test.exs)?$/, _vars, _state do

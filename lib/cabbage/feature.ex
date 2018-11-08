@@ -121,7 +121,7 @@ defmodule Cabbage.Feature do
   """
   import Cabbage.Feature.Helpers
 
-  @feature_opts [:file, :template]
+  @feature_opts [:file, :template, :tags]
   defmacro __using__(opts) do
     {opts, exunit_opts} = Keyword.split(opts, @feature_opts)
     is_feature = !match?(nil, opts[:file])
@@ -135,6 +135,7 @@ defmodule Cabbage.Feature do
           quote do
             @before_compile unquote(__MODULE__)
             use unquote(opts[:template] || ExUnit.Case), unquote(exunit_opts)
+            @integration_tags unquote(opts[:tags])
           end
         end
       )
@@ -175,6 +176,7 @@ defmodule Cabbage.Feature do
     scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
     tags = Module.get_attribute(env.module, :tags) || []
+    integration_tags = Module.get_attribute(env.module, :integration_tags) |> List.wrap()
 
     Enum.with_index(scenarios)
     |> Enum.map(fn {scenario, test_number} ->
@@ -209,7 +211,7 @@ defmodule Cabbage.Feature do
              )}
           end
 
-          tags = unquote(Macro.escape(map_tags(Cabbage.global_tags() ++ scenario.tags))) || []
+          tags = unquote(Macro.escape(map_tags(integration_tags ++ Cabbage.global_tags() ++ scenario.tags))) || []
 
           ExUnit.Case.register_test(
             unquote(Macro.escape(%{env | line: scenario.line})),

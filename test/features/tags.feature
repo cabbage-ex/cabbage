@@ -21,7 +21,12 @@ Feature: Tag Scenario
     When it takes longer than the timeout
     Then the test fails
 
-  Scenario: Run test for a scenario tagged as @global_integration_test
+  Scenario: All tests have tag set from config (@global_integration_test)
     Given global tag is set to "@global_integration_test"
     When run mix test --only "@global_integration_test" some_test.exs
     Then this test should be marked with "@global_integration_test" tag
+
+  Scenario: All tests have tag set from integration file (@feature_integration_test)
+    Given feature test file has provided tag "@feature_integration_test"
+    When run mix test --only "@feature_integration_test" some_test.exs
+    Then this test should be marked with "@feature_integration_test" tag
