@@ -209,8 +209,7 @@ defmodule Cabbage.Feature do
              )}
           end
 
-          @tag :integration
-          tags = unquote(Macro.escape(map_tags(scenario.tags))) || []
+          tags = unquote(Macro.escape(map_tags(Cabbage.global_tags() ++ scenario.tags))) || []
 
           ExUnit.Case.register_test(
             unquote(Macro.escape(%{env | line: scenario.line})),

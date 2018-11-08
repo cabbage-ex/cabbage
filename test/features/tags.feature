@@ -7,7 +7,7 @@ Feature: Tag Scenario
   Scenario: Run test for a scenario tagged as @wip
     Given a scenario is tagged as "@wip"
     When run mix test --only wip some_test.exs
-    Then this test should be marked with that tag
+    Then this test should be marked with "@wip" tag
 
   @skip
   Scenario: Skipping tests
@@ -20,3 +20,8 @@ Feature: Tag Scenario
     Given a scenario is tagged as "@timeout"
     When it takes longer than the timeout
     Then the test fails
+
+  Scenario: Run test for a scenario tagged as @global_integration_test
+    Given global tag is set to "@global_integration_test"
+    When run mix test --only "@global_integration_test" some_test.exs
+    Then this test should be marked with "@global_integration_test" tag
