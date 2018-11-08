@@ -10,11 +10,13 @@ defmodule Cabbage.TagsTest do
   end
 
   defwhen ~r/^it takes longer than the timeout$/, _vars, _state do
-    Process.sleep(0) # Change to 1500 to test
+    # Change to 1500 to test
+    Process.sleep(0)
   end
 
   defthen ~r/^the test fails$/, _vars, _state do
-    assert :ok # Not able to test
+    # Not able to test
+    assert :ok
   end
 
   defthen ~r/^this test should be marked with that tag$/, _vars, %{tag: _tag} do
