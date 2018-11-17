@@ -3,12 +3,12 @@ Feature: Can have complex features
 
   Scenario: Can create scenario with dynamic key ingredients
     Given I provide Given with "given dynamic" part
-    When I provide When with "and dynamic" part and with one more "another when dynamic" part
-    Then I provide Then with "when dynamic" part and with docs part
+    When I provide When with "when dynamic" part and with one more "another when dynamic" part
+    Then I provide Then with "then dynamic" part and with docs part
       """
       Here is provided some complex part that is way to complex
       """
-    And I provide And with "then dynamic" part and with one more "another when dynamic" part and with docs part
+    And I provide And with "and dynamic" part and with one more "another and dynamic" part and with docs part
       | Name | Age |
       | John | 30 |
       | Ann | 29 |

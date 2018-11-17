@@ -124,7 +124,7 @@ defmodule Cabbage.FeatureSuggestionTest do
       end
 
       ExUnit.Server.modules_loaded()
-      assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0}
+      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
     end
   end
 
@@ -149,7 +149,7 @@ defmodule Cabbage.FeatureSuggestionTest do
     test "Show missing dynamic When step with two dynamic parts" do
       message = """
       Please add a matching step for:
-      "When I provide When with \"and dynamic\" part and with one more \"another when dynamic\" part"
+      "When I provide When with \"when dynamic\" part and with one more \"another when dynamic\" part"
 
         defwhen ~r/^I provide When with \"(?<string_1>[^\"]+)\" part and with one more \"(?<string_2>[^\"]+)\" part$/, %{string_1: string_1, string_2: string_2}, state do
           # Your implementation here
@@ -204,7 +204,7 @@ defmodule Cabbage.FeatureSuggestionTest do
     # test "Show missing dynamic And step with three dynamic parts one of which is docs" do
     #   message = """
     #   Please add a matching step for:
-    #   "And I provide And with \"then dynamic\" part and with one more \"another when dynamic\" part and with docs part"
+    #   "And I provide And with \"then dynamic\" part and with one more \"another then dynamic\" part and with docs part"
     #
     #     defthen ~r/^I provide And with \"(?<string_1>[^\"]+)\" part and with one more \"(?<string_2>[^\"]+)\" part and with docs part$/, %{string_1: string_1, string_2: string_2, doc_string: doc_string}, state do
     #       # Your implementation here
@@ -262,7 +262,7 @@ defmodule Cabbage.FeatureSuggestionTest do
       end
 
       ExUnit.Server.modules_loaded()
-      assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0}
+      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
     end
   end
 
