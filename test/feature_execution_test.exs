@@ -119,14 +119,12 @@ defmodule Cabbage.FeatureExecutionTest do
         end
 
         defthen ~r/^I provide And with \"(?<string_1>[^\"]+)\" part and with one more \"(?<string_2>[^\"]+)\" part and with docs part$/,
-                %{string_1: string_1, string_2: string_2, doc_string: doc_string},
+                %{string_1: string_1, string_2: string_2, table: table},
                 _state do
           assert string_1 == "and dynamic"
           assert string_2 == "another and dynamic"
 
-          # TODO: Inline table docs arent passed
-          complex_string = ""
-          assert doc_string == complex_string
+          assert table == [%{Age: "30", Name: "John"}, %{Age: "29", Name: "Ann"}]
         end
       end
 
