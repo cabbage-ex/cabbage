@@ -19,7 +19,7 @@ defmodule Cabbage.FeatureTagsTest do
       Application.put_env(:cabbage, :global_tags, :global_cabbage_tag)
 
       defmodule FeatureTagsTestWithTags do
-        use Cabbage.Feature, file: "tags.feature", tags: [:cabbage_style_tag]
+        use Cabbage.Feature, file: "tags.feature"
         @moduletag :ex_unit_style_tag
 
         defwhen ~r/^I provide When$/, _vars, _state do
@@ -45,9 +45,6 @@ defmodule Cabbage.FeatureTagsTest do
       assert result == %{failures: 0, skipped: 0, total: 8, excluded: 6}
 
       {result, _output} = run_with_filter([exclude: [:test], include: [:ex_unit_style_tag]], modules)
-      assert result == %{failures: 0, skipped: 0, total: 8, excluded: 4}
-
-      {result, _output} = run_with_filter([exclude: [:test], include: [:cabbage_style_tag]], modules)
       assert result == %{failures: 0, skipped: 0, total: 8, excluded: 4}
 
       {result, _output} = run_with_filter([exclude: [:test], include: [:global_cabbage_tag]], modules)
