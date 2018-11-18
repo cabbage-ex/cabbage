@@ -12,24 +12,15 @@ defmodule Cabbage.FeatureAttributesTest do
   describe "Feature has correct attributes" do
     test "simple feature contains correct attributes" do
       defmodule FeatureAttributeTest do
-        use Cabbage.Feature, file: "simple.feature"
+        use Cabbage.Feature, file: "simplest.feature"
         alias Gherkin.Elements.Scenario
 
         test "has a @feature" do
           # [:background_steps, :description, :file, :line, :name, :role, :scenarios, :tags]
-          assert "Can have simple feature" == @feature.name
+          assert "Placeholder feature" == @feature.name
           assert [%Scenario{} = scenario] = @feature.scenarios
-          assert "Can create scenario with all key ingredients" == scenario.name
-          assert 4 == length(scenario.steps)
-        end
-
-        defgiven ~r/^I provide Given$/, _vars, _state do
-        end
-
-        defgiven ~r/^I provide And$/, _vars, _state do
-        end
-
-        defwhen ~r/^I provide When$/, _vars, _state do
+          assert "Placeholder scenario" == scenario.name
+          assert 1 == length(scenario.steps)
         end
 
         defthen ~r/^I provide Then$/, _vars, _state do

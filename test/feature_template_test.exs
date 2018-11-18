@@ -18,19 +18,7 @@ defmodule Cabbage.FeatureTestTest do
     end
 
     defmodule FeatureTimeoutTest do
-      use Cabbage.Feature, file: "simple.feature", template: CustomTemplate
-
-      defgiven ~r/^I provide Given$/, _vars, _state do
-        # Your implementation here
-      end
-
-      defgiven ~r/^I provide And$/, _vars, _state do
-        # Your implementation here
-      end
-
-      defwhen ~r/^I provide When$/, _vars, _state do
-        # Your implementation here
-      end
+      use Cabbage.Feature, file: "simplest.feature", template: CustomTemplate
 
       defthen ~r/^I provide Then$/, _vars, state do
         assert state.case_template == CustomTemplate

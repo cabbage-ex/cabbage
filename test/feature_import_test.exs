@@ -11,17 +11,8 @@ defmodule Cabbage.FeatureImportTest do
       end
 
       defmodule FeatureImporterTest do
-        use Cabbage.Feature, file: "simple.feature"
+        use Cabbage.Feature, file: "simplest.feature"
         import_steps(FeatureImportableTest)
-
-        defgiven ~r/^I provide Given$/, _vars, _state do
-        end
-
-        defgiven ~r/^I provide And$/, _vars, _state do
-        end
-
-        defwhen ~r/^I provide When$/, _vars, _state do
-        end
 
         defthen ~r/^I provide Then$/, _vars, _state do
         end
@@ -35,21 +26,12 @@ defmodule Cabbage.FeatureImportTest do
       defmodule FeatureImportableTest2 do
         use Cabbage.Feature
 
-        defgiven ~r/^I provide Given$/, _vars, _state do
-        end
-
-        defgiven ~r/^I provide And$/, _vars, _state do
-        end
-
-        defwhen ~r/^I provide When$/, _vars, _state do
-        end
-
         defthen ~r/^I provide Then$/, _vars, _state do
         end
       end
 
       defmodule FeatureImporterTest2 do
-        use Cabbage.Feature, file: "simple.feature"
+        use Cabbage.Feature, file: "simplest.feature"
         import_steps(FeatureImportableTest2)
       end
 

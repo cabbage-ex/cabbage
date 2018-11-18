@@ -38,19 +38,10 @@ defmodule Cabbage.FeatureExecutionTest do
 
     test "error on returning {:ok, not a map}" do
       defmodule FeatureExecutionTest2 do
-        use Cabbage.Feature, file: "simple.feature"
-
-        defgiven ~r/^I provide Given$/, _vars, _state do
-          {:ok, [some: :some]}
-        end
-
-        defgiven ~r/^I provide And$/, _vars, _state do
-        end
-
-        defwhen ~r/^I provide When$/, _vars, _state do
-        end
+        use Cabbage.Feature, file: "simplest.feature"
 
         defthen ~r/^I provide Then$/, _vars, _state do
+          {:ok, [some: :some]}
         end
       end
 

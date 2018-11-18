@@ -7,19 +7,7 @@ defmodule Cabbage.FeatureTimeoutTest do
   describe "Scenarios can provide custom timeout" do
     test "scenario that takes too long stops executing" do
       defmodule FeatureTimeoutTest do
-        use Cabbage.Feature, file: "simple.feature"
-
-        defgiven ~r/^I provide Given$/, _vars, _state do
-          # Your implementation here
-        end
-
-        defgiven ~r/^I provide And$/, _vars, _state do
-          # Your implementation here
-        end
-
-        defwhen ~r/^I provide When$/, _vars, _state do
-          # Your implementation here
-        end
+        use Cabbage.Feature, file: "simplest.feature"
 
         defthen ~r/^I provide Then$/, _vars, _state do
           Process.sleep(:infinity)
