@@ -178,6 +178,13 @@ defmodule Cabbage.Feature do
 
     Enum.with_index(scenarios)
     |> Enum.map(fn {scenario, test_number} ->
+      scenario =
+        Map.put(
+          scenario,
+          :tags,
+          Cabbage.global_tags() ++ List.wrap(Module.get_attribute(env.module, :moduletag)) ++ scenario.tags
+        )
+
       quote do
         describe "#{unquote(test_number)}. #{unquote(scenario.name)}" do
           @scenario unquote(Macro.escape(scenario))
@@ -209,7 +216,7 @@ defmodule Cabbage.Feature do
              )}
           end
 
-          tags = unquote(Macro.escape(map_tags(Cabbage.global_tags() ++ scenario.tags))) || []
+          tags = unquote(Macro.escape(map_tags(scenario.tags))) || []
 
           ExUnit.Case.register_test(
             unquote(Macro.escape(%{env | line: scenario.line})),

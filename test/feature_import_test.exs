@@ -75,7 +75,55 @@ defmodule Cabbage.FeatureImportTest do
   end
 
   describe "Features can import tags from other features" do
-    # TODO: Implement
+    test "can import empty tags" do
+      defmodule FeatureImportableTest4 do
+        use Cabbage.Feature
+      end
+
+      defmodule FeatureImporterTest4 do
+        use Cabbage.Feature, file: "simplest.feature"
+        import_tags(FeatureImportableTest4)
+
+        defthen ~r/^I provide Then$/, _vars, _state do
+        end
+      end
+
+      ExUnit.Server.modules_loaded()
+      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+    end
+
+    @doc """
+    tag callback isn't called
+    """
+    test "can import provided tags" do
+      defmodule FeatureImportableTest5 do
+        use Cabbage.Feature
+
+        tag @module_tag do
+          {:ok, %{module_state: "state"}}
+        end
+
+        tag @another_module_tag do
+          4
+        end
+      end
+
+      defmodule FeatureImporterTest5 do
+        use Cabbage.Feature, file: "simplest.feature"
+        @moduletag :module_tag
+        @moduletag :another_module_tag
+
+        import_tags(FeatureImportableTest5)
+
+        defthen ~r/^I provide Then$/, _vars, state do
+          assert state.module_state == "state"
+        end
+      end
+
+      # %{failures: 0, skipped: 0, total: 1, excluded: 0}
+      ExUnit.Server.modules_loaded()
+      capture_io(fn -> assert ExUnit.run() end) |> IO.inspect()
+    end
   end
 
   describe "Features can import whole features" do

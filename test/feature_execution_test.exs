@@ -17,7 +17,7 @@ defmodule Cabbage.FeatureExecutionTest do
           [:given | state]
         end
 
-        defgiven ~r/^I provide And$/, _vars, %{state: state} do
+        defand ~r/^I provide And$/, _vars, %{state: state} do
           assert [:initial] == state
           nil
         end
@@ -87,7 +87,7 @@ defmodule Cabbage.FeatureExecutionTest do
       defmodule FeatureExecutionTest4 do
         use Cabbage.Feature, file: "dynamic.feature"
 
-        defgiven ~r/^I provide Given with \"(?<string_1>[^\"]+)\" part$/, %{string_1: string_1}, _state do
+        defgiven ~r/^I provide Given with \'(?<string_1>[^\']+)\' part$/, %{string_1: string_1}, _state do
           assert string_1 == "given dynamic"
         end
 
@@ -98,14 +98,15 @@ defmodule Cabbage.FeatureExecutionTest do
           assert string_2 == "another when dynamic"
         end
 
-        defthen ~r/^I provide Then with \"(?<string_1>[^\"]+)\" part and with docs part$/,
-                %{string_1: string_1, doc_string: doc_string},
+        defthen ~r/^I provide Then with number (?<number_1>\d+) part and with docs part$/,
+                %{number_1: number_1, doc_string: doc_string},
                 _state do
           complex_string = """
           Here is provided some complex part that is way to complex
           """
 
-          assert string_1 == "then dynamic"
+          # TODO: Shouldn't it be casted to a integer?
+          assert number_1 == "6"
           assert doc_string == complex_string
         end
 
