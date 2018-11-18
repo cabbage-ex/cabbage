@@ -4,6 +4,7 @@ defmodule MissingStepAdvisorTest do
   test "raises RuntimeError if step is missing" do
     step_text = "I am Bob"
     step_type = "Given"
+
     expected_message = """
     Please add a matching step for:
     "Given I am Bob"
@@ -19,6 +20,7 @@ defmodule MissingStepAdvisorTest do
   test "convert double quote strings to regex capture group in message" do
     step_text = "my name is \"Miran\""
     step_type = "Given"
+
     expected_message = """
     Please add a matching step for:
     "Given my name is "Miran""
@@ -27,12 +29,14 @@ defmodule MissingStepAdvisorTest do
         # Your implementation here
       end
     """
+
     assert_correct_message(step_text, step_type, expected_message)
   end
 
   test "convert multiple double quote strings" do
     step_text = "my first name is \"Erol\" and my nickname is \"Hungry Homer\""
     step_type = "Given"
+
     expected_message = """
     Please add a matching step for:
     "Given my first name is "Erol" and my nickname is "Hungry Homer""
@@ -41,12 +45,14 @@ defmodule MissingStepAdvisorTest do
         # Your implementation here
       end
     """
+
     assert_correct_message(step_text, step_type, expected_message)
   end
 
   test "convert single quote strings to regex capture group in message" do
     step_text = "my name is 'Miran'"
     step_type = "Given"
+
     expected_message = """
     Please add a matching step for:
     "Given my name is 'Miran'"
@@ -62,6 +68,7 @@ defmodule MissingStepAdvisorTest do
   test "convert multiple single quote strings" do
     step_text = "my favourite food & drink is 'Cheese' and 'Liquid Cheese'"
     step_type = "And"
+
     expected_message = """
     Please add a matching step for:
     "And my favourite food & drink is 'Cheese' and 'Liquid Cheese'"
@@ -77,6 +84,7 @@ defmodule MissingStepAdvisorTest do
   test "convert numbers to regex capture group in message" do
     step_text = "I am 49 years old"
     step_type = "And"
+
     expected_message = """
     Please add a matching step for:
     "And I am 49 years old"
@@ -92,6 +100,7 @@ defmodule MissingStepAdvisorTest do
   test "converting numbers to regex capture group ignores numbers with letters" do
     step_text = "the 3rd number is 1101"
     step_type = "When"
+
     expected_message = """
     Please add a matching step for:
     "When the 3rd number is 1101"
@@ -107,6 +116,7 @@ defmodule MissingStepAdvisorTest do
   test "convert numbers to capture group where number is at the beginning" do
     step_text = "29 is my favourite number"
     step_type = "Given"
+
     expected_message = """
     Please add a matching step for:
     "Given 29 is my favourite number"
@@ -122,6 +132,7 @@ defmodule MissingStepAdvisorTest do
   test "convert multiple numbers to capture groups" do
     step_text = "there are 3 on the left and 2 on the right"
     step_type = "And"
+
     expected_message = """
     Please add a matching step for:
     "And there are 3 on the left and 2 on the right"
@@ -135,10 +146,12 @@ defmodule MissingStepAdvisorTest do
   end
 
   defp assert_correct_message(step_text, step_type, expected_message) do
-    assert_raise(MissingStepError,
-                 expected_message,
-                 fn ->
-                   raise MissingStepError, [step_text: step_text, step_type: step_type]
-                 end)
+    assert_raise(
+      MissingStepError,
+      expected_message,
+      fn ->
+        raise MissingStepError, step_text: step_text, step_type: step_type
+      end
+    )
   end
 end

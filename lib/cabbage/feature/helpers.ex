@@ -8,6 +8,7 @@ defmodule Cabbage.Feature.Helpers do
   end
 
   def add_tag(module, "@" <> tag_name, block), do: add_tag(module, tag_name, block)
+
   def add_tag(module, tag_name, block) do
     Module.put_attribute(module, :tags, {tag_name, block})
     quote(do: nil)
@@ -15,6 +16,7 @@ defmodule Cabbage.Feature.Helpers do
 
   def evaluate_tag_block(block) do
     {new_state, _} = Code.eval_quoted(block)
+
     case new_state do
       {:ok, state} -> state
       _ -> %{}
@@ -22,15 +24,17 @@ defmodule Cabbage.Feature.Helpers do
   end
 
   def file(file) do
-    String.replace_leading file, "#{File.cwd!}/", ""
+    String.replace_leading(file, "#{File.cwd!()}/", "")
   end
 
   def metadata(env, function) do
-     %{file: file(env.file), line: env.line, module: env.module, function: function, arity: 4}
+    %{file: file(env.file), line: env.line, module: env.module, function: function, arity: 4}
   end
 
   def stacktrace(module, metadata) do
-    [{module, metadata[:function], metadata[:arity], [file: metadata[:file], line: metadata[:line]]}]
+    [
+      {module, metadata[:function], metadata[:arity], [file: metadata[:file], line: metadata[:line]]}
+    ]
   end
 
   def agent_name(scenario_name, module_name) do
@@ -45,8 +49,11 @@ defmodule Cabbage.Feature.Helpers do
   def start_state(scenario_name, module_name, state) do
     name = scenario_name |> agent_name(module_name)
     agent = Process.whereis(name)
+
     if agent do
-      update_state(scenario_name, module_name, fn s -> Map.merge(s, state) |> remove_hidden_state() end)
+      update_state(scenario_name, module_name, fn s ->
+        Map.merge(s, state) |> remove_hidden_state()
+      end)
     else
       Agent.start(fn -> state end, name: name)
     end
@@ -54,7 +61,7 @@ defmodule Cabbage.Feature.Helpers do
 
   def fetch_state(scenario_name, module_name) do
     name = scenario_name |> agent_name(module_name)
-    (Process.whereis(name) && Agent.get(name, &(&1)) || %{}) |> remove_hidden_state()
+    ((Process.whereis(name) && Agent.get(name, & &1)) || %{}) |> remove_hidden_state()
   end
 
   def update_state(scenario_name, module_name, fun) do
@@ -65,13 +72,16 @@ defmodule Cabbage.Feature.Helpers do
 
   def run_tag(tags, tag, module, scenario_name) do
     string_tag = to_string(tag)
-    case Enum.find(tags, &(match?({^string_tag, _}, &1))) do
+
+    case Enum.find(tags, &match?({^string_tag, _}, &1)) do
       {^string_tag, block} ->
-        Logger.debug "Cabbage: Running tag @#{tag}..."
+        Logger.debug("Cabbage: Running tag @#{tag}...")
         state = evaluate_tag_block(block)
         start_state(scenario_name, module, state)
+
       _ ->
-        nil # Nothing to do
+        # Nothing to do
+        nil
     end
   end
 
@@ -80,6 +90,7 @@ defmodule Cabbage.Feature.Helpers do
     |> Enum.map(fn
       {tag, value} ->
         [{tag, value}]
+
       tag ->
         tag
     end)

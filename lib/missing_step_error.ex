@@ -25,7 +25,7 @@ defmodule MissingStepError do
     Please add a matching step for:
     "#{step_type} #{step_text}"
 
-      def#{step_type |> String.downcase} ~r/^#{converted_step_text}$/, #{map_of_vars}, state do
+      def#{step_type |> String.downcase()} ~r/^#{converted_step_text}$/, #{map_of_vars}, state do
         # Your implementation here
       end
     """
@@ -66,7 +66,7 @@ defmodule MissingStepError do
     join_regex_split(tail, count + 1, type, {step_text, vars})
   end
 
-  defp get_regex_capture_string(:number, count),              do: ~s/ (?<number_#{count}>\\d+) /
+  defp get_regex_capture_string(:number, count), do: ~s/ (?<number_#{count}>\\d+) /
   defp get_regex_capture_string(:single_quote_string, count), do: ~s/'(?<string_#{count}>[^']+)'/
   defp get_regex_capture_string(:double_quote_string, count), do: ~s/"(?<string_#{count}>[^"]+)"/
 
@@ -75,10 +75,11 @@ defmodule MissingStepError do
   defp get_var_string(:double_quote_string, count), do: "string_#{count}"
 
   defp vars_to_correct_format([]), do: "_vars"
+
   defp vars_to_correct_format(vars) do
     joined_vars =
       vars
-      |> Enum.map(fn(var) -> "#{var}: #{var}" end)
+      |> Enum.map(fn var -> "#{var}: #{var}" end)
       |> Enum.join(", ")
 
     "%{#{joined_vars}}"

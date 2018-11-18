@@ -1,6 +1,6 @@
 defmodule Cabbage.TemplateTest do
   use Cabbage.Feature, template: Cabbage.ExUnit.CaseTemplate, file: "coffee.feature"
-  import_feature Cabbage.GlobalFeatures
+  import_feature(Cabbage.GlobalFeatures)
 
   defwhen ~r/^I press the coffee button$/, _, %{case_template: template, deposited: deposited} do
     assert Cabbage.ExUnit.CaseTemplate = template

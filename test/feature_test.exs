@@ -3,8 +3,8 @@ defmodule Cabbage.FeatureTest do
   alias Gherkin.Elements.Scenario
   doctest Cabbage.Feature
 
-  import_feature Cabbage.GlobalFeatures
-  import_steps Cabbage.TaglessFeatures
+  import_feature(Cabbage.GlobalFeatures)
+  import_steps(Cabbage.TaglessFeatures)
 
   test "has an @feature" do
     assert "Serve coffee" = @feature.name
