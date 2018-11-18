@@ -4,7 +4,7 @@ defmodule Cabbage.FeatureAttributesTest do
   @moduledoc """
   TODO: Is this test even necessary?
   It seems to test Gherkin library, not this one.
-  Inspired by
+  Inspired by Cabbage.FeatureTest
   """
   use ExUnit.Case
   import ExUnit.CaptureIO
