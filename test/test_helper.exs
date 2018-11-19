@@ -12,15 +12,11 @@ defmodule CabbageTestHelper do
 
   def run(filters \\ [], cases \\ [])
 
-  def run(filters, cases) do
-    Enum.each(cases, &ExUnit.Server.add_sync_module/1)
+  def run(filters, module) do
+    {add_module, load_module} = versioned_callbacks()
 
-    System.version()
-    |> Version.compare("1.6.0")
-    |> case do
-      :lt -> ExUnit.Server.cases_loaded()
-      _ -> ExUnit.Server.modules_loaded()
-    end
+    Enum.each(module, add_module)
+    load_module.()
 
     opts =
       ExUnit.configuration()
@@ -29,5 +25,14 @@ defmodule CabbageTestHelper do
 
     output = capture_io(fn -> Process.put(:capture_result, ExUnit.Runner.run(opts, nil)) end)
     {Map.merge(%{excluded: 0}, Process.get(:capture_result)), output}
+  end
+
+  defp versioned_callbacks() do
+    System.version()
+    |> Version.compare("1.6.0")
+    |> case do
+      :lt -> {&ExUnit.Server.add_sync_case/1, &ExUnit.Server.cases_loaded/0}
+      _ -> {&ExUnit.Server.add_sync_module/1, &ExUnit.Server.modules_loaded/0}
+    end
   end
 end
