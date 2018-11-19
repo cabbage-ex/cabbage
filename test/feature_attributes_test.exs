@@ -7,7 +7,6 @@ defmodule Cabbage.FeatureAttributesTest do
   Inspired by Cabbage.FeatureTest
   """
   use ExUnit.Case
-  import ExUnit.CaptureIO
 
   describe "Feature has correct attributes" do
     test "simple feature contains correct attributes" do
@@ -27,8 +26,8 @@ defmodule Cabbage.FeatureAttributesTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 2, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 2, excluded: 0}
     end
 
     test "outlined feature contains correct attributes" do
@@ -87,8 +86,8 @@ defmodule Cabbage.FeatureAttributesTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 7, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 7, excluded: 0}
     end
   end
 end

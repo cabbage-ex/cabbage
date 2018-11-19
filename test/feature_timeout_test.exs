@@ -2,7 +2,6 @@ Code.require_file("test_helper.exs", __DIR__)
 
 defmodule Cabbage.FeatureTimeoutTest do
   use ExUnit.Case
-  import ExUnit.CaptureIO
 
   describe "Scenarios can provide custom timeout" do
     test "scenario that takes too long stops executing" do
@@ -14,9 +13,8 @@ defmodule Cabbage.FeatureTimeoutTest do
         end
       end
 
-      ExUnit.configure(timeout: 10)
-      ExUnit.Server.modules_loaded()
-      output = capture_io(fn -> assert ExUnit.run() == %{failures: 1, skipped: 0, total: 1, excluded: 0} end)
+      {result, output} = CabbageTestHelper.run(timeout: 10)
+      assert result == %{failures: 1, skipped: 0, total: 1, excluded: 0}
       assert output =~ "** (ExUnit.TimeoutError) test timed out after 10ms"
       assert output =~ ~r"\(elixir\) lib/process\.ex:\d+: Process\.sleep/1"
     end
@@ -34,9 +32,8 @@ defmodule Cabbage.FeatureTimeoutTest do
         end
       end
 
-      ExUnit.configure(timeout: 10)
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run(timeout: 10)
+      assert result == %{failures: 0, skipped: 0, total: 1, excluded: 0}
     end
   end
 end

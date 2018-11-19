@@ -2,7 +2,6 @@ Code.require_file("test_helper.exs", __DIR__)
 
 defmodule Cabbage.FeatureExecutionTest do
   use ExUnit.Case
-  import ExUnit.CaptureIO
 
   describe "Tests execution" do
     test "ignores steps that doesn't comply to pattern {:ok, map}" do
@@ -32,8 +31,8 @@ defmodule Cabbage.FeatureExecutionTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 1, excluded: 0}
     end
 
     test "error on returning {:ok, not a map}" do
@@ -45,8 +44,9 @@ defmodule Cabbage.FeatureExecutionTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      assert capture_io(fn -> ExUnit.run() end) =~ "** (BadMapError) expected a map, got: [some: :some]"
+      {result, output} = CabbageTestHelper.run()
+      assert result == %{failures: 1, skipped: 0, total: 1, excluded: 0}
+      assert output =~ "** (BadMapError) expected a map, got: [some: :some]"
     end
 
     test "accepts state steps that does comply to pattern {:ok, map}" do
@@ -77,8 +77,8 @@ defmodule Cabbage.FeatureExecutionTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 1, excluded: 0}
     end
   end
 
@@ -120,8 +120,8 @@ defmodule Cabbage.FeatureExecutionTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 1, excluded: 0}
     end
 
     test "outlined data are passed to steps" do
@@ -185,8 +185,8 @@ defmodule Cabbage.FeatureExecutionTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 6, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 6, excluded: 0}
     end
   end
 end

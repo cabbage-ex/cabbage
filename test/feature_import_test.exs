@@ -2,7 +2,6 @@ Code.require_file("test_helper.exs", __DIR__)
 
 defmodule Cabbage.FeatureImportTest do
   use ExUnit.Case
-  import ExUnit.CaptureIO
 
   describe "Features can import steps from other features" do
     test "can import empty steps" do
@@ -18,8 +17,8 @@ defmodule Cabbage.FeatureImportTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 1, excluded: 0}
     end
 
     test "can import all steps" do
@@ -35,8 +34,8 @@ defmodule Cabbage.FeatureImportTest do
         import_steps(FeatureImportableTest2)
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 1, excluded: 0}
     end
 
     test "can work together with imported steps" do
@@ -69,8 +68,8 @@ defmodule Cabbage.FeatureImportTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 1, excluded: 0}
     end
   end
 
@@ -88,8 +87,8 @@ defmodule Cabbage.FeatureImportTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 1, excluded: 0}
     end
 
     test "can import provided tags" do
@@ -111,8 +110,8 @@ defmodule Cabbage.FeatureImportTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 1, excluded: 0}
     end
   end
 
@@ -148,8 +147,8 @@ defmodule Cabbage.FeatureImportTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 1, excluded: 0}
     end
   end
 end

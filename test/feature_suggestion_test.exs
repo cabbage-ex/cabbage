@@ -2,7 +2,6 @@ Code.require_file("test_helper.exs", __DIR__)
 
 defmodule Cabbage.FeatureSuggestionTest do
   use ExUnit.Case
-  import ExUnit.CaptureIO
 
   describe "provide simple missing steps" do
     test "Show missing Given step" do
@@ -126,8 +125,8 @@ defmodule Cabbage.FeatureSuggestionTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 1, excluded: 0}
     end
   end
 
@@ -265,8 +264,8 @@ defmodule Cabbage.FeatureSuggestionTest do
         end
       end
 
-      ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 1, excluded: 0}
     end
   end
 
