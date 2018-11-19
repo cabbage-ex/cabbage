@@ -28,6 +28,6 @@ defmodule CabbageTestHelper do
       |> Keyword.merge(colors: [enabled: false])
 
     output = capture_io(fn -> Process.put(:capture_result, ExUnit.Runner.run(opts, nil)) end)
-    {Process.get(:capture_result), output}
+    {Map.merge(%{excluded: 0}, Process.get(:capture_result)), output}
   end
 end
