@@ -14,7 +14,13 @@ defmodule CabbageTestHelper do
 
   def run(filters, cases) do
     Enum.each(cases, &ExUnit.Server.add_sync_module/1)
-    ExUnit.Server.modules_loaded()
+
+    System.version()
+    |> Version.compare("1.6.0")
+    |> case do
+      :lt -> ExUnit.Server.cases_loaded()
+      _ -> ExUnit.Server.modules_loaded()
+    end
 
     opts =
       ExUnit.configuration()
