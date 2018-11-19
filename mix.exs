@@ -6,7 +6,7 @@ defmodule Cabbage.Mixfile do
     [
       app: :cabbage,
       version: @version,
-      elixir: "~> 1.3",
+      elixir: "~> 1.7",
       source_url: "git@github.com:cabbage-ex/cabbage.git",
       homepage_url: "https://github.com/cabbage-ex/cabbage",
       elixirc_paths: elixirc_paths(Mix.env()),
