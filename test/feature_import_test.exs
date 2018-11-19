@@ -92,9 +92,6 @@ defmodule Cabbage.FeatureImportTest do
       capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
     end
 
-    @doc """
-    tag callback isn't called
-    """
     test "can import provided tags" do
       defmodule FeatureImportableTest5 do
         use Cabbage.Feature
@@ -102,17 +99,11 @@ defmodule Cabbage.FeatureImportTest do
         tag @module_tag do
           {:ok, %{module_state: "state"}}
         end
-
-        tag @another_module_tag do
-          4
-        end
       end
 
       defmodule FeatureImporterTest5 do
         use Cabbage.Feature, file: "simplest.feature"
         @moduletag :module_tag
-        @moduletag :another_module_tag
-
         import_tags(FeatureImportableTest5)
 
         defthen ~r/^I provide Then$/, _vars, state do
@@ -120,13 +111,45 @@ defmodule Cabbage.FeatureImportTest do
         end
       end
 
-      # %{failures: 0, skipped: 0, total: 1, excluded: 0}
       ExUnit.Server.modules_loaded()
-      capture_io(fn -> assert ExUnit.run() end) |> IO.inspect()
+      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
     end
   end
 
   describe "Features can import whole features" do
-    # TODO: Implement
+    test "can import whole features" do
+      defmodule FeatureImportableTest6 do
+        use Cabbage.Feature
+
+        tag @module_tag do
+          {:ok, %{state: 10}}
+        end
+
+        defgiven ~r/^I provide Given$/, _vars, %{state: state} do
+          {:ok, %{state: state + 1}}
+        end
+
+        defgiven ~r/^I provide And$/, _vars, %{state: state} do
+          {:ok, %{state: state + 1}}
+        end
+      end
+
+      defmodule FeatureImporterTest6 do
+        use Cabbage.Feature, file: "simple.feature"
+        import_feature(FeatureImportableTest6)
+        @moduletag :module_tag
+
+        defwhen ~r/^I provide When$/, _vars, %{state: state} do
+          {:ok, %{state: state + 1}}
+        end
+
+        defthen ~r/^I provide Then$/, _vars, %{state: state} do
+          assert state == 13
+        end
+      end
+
+      ExUnit.Server.modules_loaded()
+      capture_io(fn -> assert ExUnit.run() == %{failures: 0, skipped: 0, total: 1, excluded: 0} end)
+    end
   end
 end
