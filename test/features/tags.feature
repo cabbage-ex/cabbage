@@ -1,22 +1,21 @@
-Feature: Tag Scenario
-  As a Product Manager/Developer
-  I want to add tags to a scenario in a feature file
-  So I can do stuff with the steps implementation based on tags
+Feature: Can have tagged features
+  Tests apply provided tags (in feature files, in test files and globally from config)
 
-  @wip
-  Scenario: Run test for a scenario tagged as @wip
-    Given a scenario is tagged as "@wip"
-    When run mix test --only wip some_test.exs
-    Then this test should be marked with that tag
+  Scenario: Not tagged scenario
+    When I provide When
+    Then I provide Then
 
-  @skip
-  Scenario: Skipping tests
-    Given a scenario is tagged as "@skip"
-    When run mix test
-    Then this test should be skipped and never run
+  @some_tag
+  Scenario: Scenario with single tag
+    When I provide When
+    Then I provide Then
 
-  @timeout 1000
-  Scenario: Chanage the timeout value
-    Given a scenario is tagged as "@timeout"
-    When it takes longer than the timeout
-    Then the test fails
+  @some_tag @another_tag
+  Scenario: Scenario with many tags
+    When I provide When
+    Then I provide Then
+
+  @tag_with_value my_value
+  Scenario: Scenario with value for tag
+    When I provide When
+    Then I provide Then

@@ -9,8 +9,11 @@ defmodule Cabbage.Feature do
       config :cabbage,
         # Default is "test/features/"
         features: "my/path/to/features/"
+        # Default is []
+        global_tags: :integration
 
-  Allows you to specify the location of your feature files. They can be anywhere, but typically are located within the test folder.
+  - `features` - Allows you to specify the location of your feature files. They can be anywhere, but typically are located within the test folder.
+  - `global_tags` - Allow you to specify ex unit tag assigned to all cabbage generated tests
 
   ## Features
 
@@ -178,6 +181,13 @@ defmodule Cabbage.Feature do
 
     Enum.with_index(scenarios)
     |> Enum.map(fn {scenario, test_number} ->
+      scenario =
+        Map.put(
+          scenario,
+          :tags,
+          Cabbage.global_tags() ++ List.wrap(Module.get_attribute(env.module, :moduletag)) ++ scenario.tags
+        )
+
       quote do
         describe "#{unquote(test_number)}. #{unquote(scenario.name)}" do
           @scenario unquote(Macro.escape(scenario))
@@ -209,7 +219,6 @@ defmodule Cabbage.Feature do
              )}
           end
 
-          @tag :integration
           tags = unquote(Macro.escape(map_tags(scenario.tags))) || []
 
           ExUnit.Case.register_test(
