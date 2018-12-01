@@ -124,7 +124,7 @@ defmodule Cabbage.Feature do
   """
   import Cabbage.Feature.Helpers
 
-  alias Cabbage.Feature.Loader
+  alias Cabbage.Feature.{Loader, MissingStepError}
 
   @feature_options [:file, :template]
   defmacro __using__(options) do
@@ -315,7 +315,9 @@ defmodule Cabbage.Feature do
   end
 
   defp compile(_, step, step_type, _scenario_name) do
-    raise MissingStepError, step_text: step.text, step_type: step_type
+    extra_vars = %{table: step.table_data, doc_string: step.doc_string}
+
+    raise MissingStepError, step_text: step.text, step_type: step_type, extra_vars: extra_vars
   end
 
   defp find_implementation_of_step(step, steps) do
