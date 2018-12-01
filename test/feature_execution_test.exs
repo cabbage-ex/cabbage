@@ -16,7 +16,7 @@ defmodule Cabbage.FeatureExecutionTest do
           [:given | state]
         end
 
-        defand ~r/^I provide And$/, _vars, %{state: state} do
+        defgiven ~r/^I provide And$/, _vars, %{state: state} do
           assert [:initial] == state
           nil
         end

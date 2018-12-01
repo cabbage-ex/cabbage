@@ -51,7 +51,7 @@ defmodule Cabbage.Feature do
 
   ### Extracting Matched Data
 
-  You'll likely have data within your feature statements which you want to extract. The second parameter to each of `defgiven/4`, `defwhen/4`, `defthen/4` and `defand/4` is a pattern in which specifies what you want to call the matched data, provided as a map.
+  You'll likely have data within your feature statements which you want to extract. The second parameter to each of `defgiven/4`, `defwhen/4` and `defthen/4` is a pattern in which specifies what you want to call the matched data, provided as a map.
 
   For example, if you want to match on a number:
 
@@ -64,7 +64,7 @@ defmodule Cabbage.Feature do
 
   ### Modifying State
 
-  You'll likely have to keep track of some state in between statements. The third parameter to each of `defgiven/4`, `defwhen/4`, `defthen/4` and `defand/4` is a pattern in which specifies what you want to call your state in the same way that the `ExUnit.Case.test/3` macro works.
+  You'll likely have to keep track of some state in between statements. The third parameter to each of `defgiven/4`, `defwhen/4` and `defthen/4` is a pattern in which specifies what you want to call your state in the same way that the `ExUnit.Case.test/3` macro works.
 
   You can setup initial state using plain ExUnit `setup/1` and `setup_all/1`. Whatever state is provided via the `test/3` macro will be your initial state.
 
@@ -72,7 +72,7 @@ defmodule Cabbage.Feature do
 
   Heres an example modifying state:
 
-      defand ~r/^I am an admin$/, _, %{user: user} do
+      defwhen ~r/^I am an admin$/, _, %{user: user} do
         {:ok, %{user: User.promote_to_admin(user)}}
       end
 
@@ -108,7 +108,7 @@ defmodule Cabbage.Feature do
       defmodule MyApp.GlobalFeatures do
         use Cabbage.Feature
 
-        # Write your `defgiven/4`, `defthen/4`, `defwhen/4` and `defand/4`s here
+        # Write your `defgiven/4`, `defthen/4` and `defwhen/4`s here
       end
 
   Then inside the test file (the .exs one) add a `import_feature MyApp.GlobalFeatures` line after the `use Cabbage.Feature` line lke so:
@@ -124,38 +124,43 @@ defmodule Cabbage.Feature do
   """
   import Cabbage.Feature.Helpers
 
-  @feature_opts [:file, :template]
-  defmacro __using__(opts) do
-    {opts, exunit_opts} = Keyword.split(opts, @feature_opts)
-    is_feature = !match?(nil, opts[:file])
+  alias Cabbage.Feature.Loader
+
+  @feature_options [:file, :template]
+  defmacro __using__(options) do
+    has_assigned_feature = !match?(nil, options[:file])
 
     Module.register_attribute(__CALLER__.module, :steps, accumulate: true)
     Module.register_attribute(__CALLER__.module, :tags, accumulate: true)
 
     quote do
-      unquote(
-        if is_feature do
-          quote do
-            @before_compile unquote(__MODULE__)
-            use unquote(opts[:template] || ExUnit.Case), unquote(exunit_opts)
-          end
-        end
-      )
+      unquote(prepare_executable_feature(has_assigned_feature, options))
 
       @before_compile {unquote(__MODULE__), :expose_metadata}
       import unquote(__MODULE__)
       require Logger
 
-      unquote(
-        if is_feature do
-          quote do
-            @feature File.read!("#{Cabbage.base_path()}#{unquote(opts[:file])}")
-                     |> Gherkin.parse()
-                     |> Gherkin.flatten()
-            @scenarios @feature.scenarios
-          end
-        end
-      )
+      unquote(load_features(has_assigned_feature, options))
+    end
+  end
+
+  defp prepare_executable_feature(false, _options), do: nil
+
+  defp prepare_executable_feature(true, options) do
+    {_options, template_options} = Keyword.split(options, @feature_options)
+
+    quote do
+      @before_compile unquote(__MODULE__)
+      use unquote(options[:template] || ExUnit.Case), unquote(template_options)
+    end
+  end
+
+  defp load_features(false, _options), do: nil
+
+  defp load_features(true, options) do
+    quote do
+      @feature Loader.load_from_file(unquote(options[:file]))
+      @scenarios @feature.scenarios
     end
   end
 
@@ -366,10 +371,6 @@ defmodule Cabbage.Feature do
 
   defmacro defgiven(regex, vars, state, do: block) do
     add_step(__CALLER__.module, regex, vars, state, block, metadata(__CALLER__, :defgiven))
-  end
-
-  defmacro defand(regex, vars, state, do: block) do
-    add_step(__CALLER__.module, regex, vars, state, block, metadata(__CALLER__, :defand))
   end
 
   defmacro defwhen(regex, vars, state, do: block) do

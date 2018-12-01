@@ -21,20 +21,12 @@ defmodule Cabbage.FeatureSuggestionTest do
       end
     end
 
-    @doc """
-    TODO: Doesn't suggest correct part line.
-    defand shouldn't even exist.
-    As in different scenarios the same given and any other term could be provided in different orders, so in one scenario it could be:
-    `Given user have milk`, but in other `And user have milk`.
-    Both should be `defgiven "user have milk", _vars, _state do`
-    As i understand defgive, defwhen, defthen and defand all work exaclty the same and there even isn't any difference between them.
-    """
     test "Show missing And step" do
       message = """
       Please add a matching step for:
-      "And I provide And"
+      "Given I provide And"
 
-        defand ~r/^I provide And$/, _vars, state do
+        defgiven ~r/^I provide And$/, _vars, state do
           # Your implementation here
         end
       """
@@ -201,15 +193,14 @@ defmodule Cabbage.FeatureSuggestionTest do
     end
 
     @doc """
-    TODO: This test doesn't work because of suggested is `defand` not `defthen`
     TODO: This test doens't work because of missing `doc_string` in `vars`
     """
     test "Show missing dynamic And step with three dynamic parts one of which is docs" do
       message = """
       Please add a matching step for:
-      "And I provide And with \"and dynamic\" part and with one more \"another and dynamic\" part and with docs part"
+      "Then I provide And with \"and dynamic\" part and with one more \"another and dynamic\" part and with docs part"
 
-        defand ~r/^I provide And with "(?<string_1>[^\"]+)\" part and with one more \"(?<string_2>[^\"]+)\" part and with docs part$/, %{string_1: string_1, string_2: string_2}, state do
+        defthen ~r/^I provide And with "(?<string_1>[^\"]+)\" part and with one more \"(?<string_2>[^\"]+)\" part and with docs part$/, %{string_1: string_1, string_2: string_2}, state do
           # Your implementation here
         end
       """
