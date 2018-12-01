@@ -1,4 +1,4 @@
-defmodule MissingStepError do
+defmodule Cabbage.Feature.MissingStepError do
   @moduledoc """
   Raises an error, because a feature step is missing its implementation.
 
@@ -12,12 +12,13 @@ defmodule MissingStepError do
   @single_quote_regex ~r/'[^']+'/
   @double_quote_regex ~r/"[^"]+"/
 
-  def exception(step_text: step_text, step_type: step_type) do
+  def exception(step_text: step_text, step_type: step_type, extra_vars: extra_vars) do
     {converted_step_text, list_of_vars} =
       {step_text, []}
       |> convert_nums()
       |> convert_double_quote_strings()
       |> convert_single_quote_strings()
+      |> convert_extra_vars(extra_vars)
 
     map_of_vars = vars_to_correct_format(list_of_vars)
 
@@ -49,6 +50,13 @@ defmodule MissingStepError do
     @single_quote_regex
     |> Regex.split(step_text)
     |> join_regex_split(1, :single_quote_string, {"", vars})
+  end
+
+  defp convert_extra_vars({step_text, vars}, %{doc_string: doc_string, table: table}) do
+    vars = if doc_string == "", do: vars, else: vars ++ ["doc_string"]
+    vars = if table == [], do: vars, else: vars ++ ["table"]
+
+    {step_text, vars}
   end
 
   defp join_regex_split([], _count, _type, {acc, vars}) do

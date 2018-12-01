@@ -8,7 +8,7 @@ Feature: Can have complex features
       """
       Here is provided some complex part that is way to complex
       """
-    And I provide And with "and dynamic" part and with one more "another and dynamic" part and with docs part
+    And I provide And with "and dynamic" part and with one more "another and dynamic" part and with table part
       | Name | Age |
       | John | 30 |
       | Ann | 29 |

@@ -16,7 +16,7 @@ defmodule Cabbage.FeatureExecutionTest do
           [:given | state]
         end
 
-        defand ~r/^I provide And$/, _vars, %{state: state} do
+        defgiven ~r/^I provide And$/, _vars, %{state: state} do
           assert [:initial] == state
           nil
         end
@@ -110,7 +110,7 @@ defmodule Cabbage.FeatureExecutionTest do
           assert doc_string == complex_string
         end
 
-        defthen ~r/^I provide And with \"(?<string_1>[^\"]+)\" part and with one more \"(?<string_2>[^\"]+)\" part and with docs part$/,
+        defthen ~r/^I provide And with \"(?<string_1>[^\"]+)\" part and with one more \"(?<string_2>[^\"]+)\" part and with table part$/,
                 %{string_1: string_1, string_2: string_2, table: table},
                 _state do
           assert string_1 == "and dynamic"
