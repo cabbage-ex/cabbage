@@ -1,5 +1,5 @@
 defmodule Cabbage.FeatureCase do
-  alias Cabbage.Feature.{ImplementedStep, Loader, OptionsManager, StepsManager, TestRunner}
+  alias Cabbage.Feature.{Loader, OptionsManager, StepsManager, TestRunner}
   alias Gherkin.Elements.{Feature, Scenario}
   alias Macro.Env
 
@@ -71,16 +71,27 @@ defmodule Cabbage.FeatureCase do
       def unquote(name)(test_state) do
         TestRunner.run_scenario(
           unquote(Macro.escape(scenario)),
-          unquote(Macro.escape(implemented_steps)),
+          unquote(implemented_steps),
           test_state
         )
       end
     end
   end
 
-  defp register_step_callback(env, type, regex, parameters, state, block) do
-    {regex, []} = Code.eval_quoted(regex)
+  defp register_step_callback(env, type, regex, parameters_pattern, state_pattern, block) do
+    callback =
+      quote generated: true do
+        fn step, test_state ->
+          with true <- StepsManager.handles_step?({unquote(type), unquote(regex)}, step),
+               unquote(parameters_pattern) <- StepsManager.extract_parameters(unquote(regex), step),
+               unquote(state_pattern) <- test_state do
+            unquote(block)
+          else
+            _ -> {:error, :no_match}
+          end
+        end
+      end
 
-    Module.put_attribute(env.module, :steps, ImplementedStep.from_raw(type, regex, parameters, state, block))
+    Module.put_attribute(env.module, :steps, callback)
   end
 end

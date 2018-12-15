@@ -6,7 +6,7 @@ defmodule Cabbage.FeatureExecutionTest do
   describe "Tests execution" do
     test "ignores steps that doesn't comply to pattern {:ok, map}" do
       defmodule FeatureExecutionTest do
-        use Cabbage.Feature, file: "simple.feature"
+        use Cabbage.FeatureCase, feature: "simple.feature"
 
         setup do
           {:ok, %{state: [:initial]}}
@@ -37,7 +37,7 @@ defmodule Cabbage.FeatureExecutionTest do
 
     test "error on returning {:ok, not a map}" do
       defmodule FeatureExecutionTest2 do
-        use Cabbage.Feature, file: "simplest.feature"
+        use Cabbage.FeatureCase, feature: "simplest.feature"
 
         defthen ~r/^I provide Then$/, _vars, _state do
           {:ok, [some: :some]}
@@ -51,7 +51,7 @@ defmodule Cabbage.FeatureExecutionTest do
 
     test "accepts state steps that does comply to pattern {:ok, map}" do
       defmodule FeatureExecutionTest3 do
-        use Cabbage.Feature, file: "simple.feature"
+        use Cabbage.FeatureCase, feature: "simple.feature"
 
         setup do
           {:ok, %{state: [:initial]}}
@@ -85,7 +85,7 @@ defmodule Cabbage.FeatureExecutionTest do
   describe "Tests contains dynamic and outlined data" do
     test "dynamic patternmatched data are passed to steps" do
       defmodule FeatureExecutionTest4 do
-        use Cabbage.Feature, file: "dynamic.feature"
+        use Cabbage.FeatureCase, feature: "dynamic.feature"
 
         defgiven ~r/^I provide Given with \'(?<string_1>[^\']+)\' part$/, %{string_1: string_1}, _state do
           assert string_1 == "given dynamic"
@@ -126,7 +126,7 @@ defmodule Cabbage.FeatureExecutionTest do
 
     test "outlined data are passed to steps" do
       defmodule FeatureExecutionTest5 do
-        use Cabbage.Feature, file: "outline.feature"
+        use Cabbage.FeatureCase, feature: "outline.feature"
 
         setup do
           datatable = %{
