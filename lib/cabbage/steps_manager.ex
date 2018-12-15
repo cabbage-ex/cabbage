@@ -1,4 +1,4 @@
-defmodule Cabbage.Feature.StepsManager do
+defmodule Cabbage.StepsManager do
   alias Gherkin.Elements.Steps
 
   def handles_step?({:given, regex}, %Steps.Given{text: text}), do: Regex.match?(regex, text)

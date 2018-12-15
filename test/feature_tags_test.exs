@@ -6,7 +6,7 @@ defmodule Cabbage.FeatureTagsTest do
   describe "Runns scenarios bassed on tags" do
     test "runs all scenarios when no tag filter is provided" do
       defmodule FeatureTagsTest do
-        use Cabbage.Feature, file: "tags.feature"
+        use Cabbage.FeatureCase, feature: "tags.feature"
 
         defwhen ~r/^I provide When$/, _vars, _state do
         end
@@ -18,7 +18,7 @@ defmodule Cabbage.FeatureTagsTest do
       Application.put_env(:cabbage, :global_tags, :global_cabbage_tag)
 
       defmodule FeatureTagsTestWithTags do
-        use Cabbage.Feature, file: "tags.feature"
+        use Cabbage.FeatureCase, feature: "tags.feature"
         @moduletag :ex_unit_style_tag
 
         defwhen ~r/^I provide When$/, _vars, _state do

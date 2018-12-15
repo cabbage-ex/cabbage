@@ -1,4 +1,6 @@
-defmodule Cabbage.Feature.MissingStepError do
+defmodule Cabbage.MissingStepError do
+  alias Gherkin.Elements.Steps
+
   @moduledoc """
   Raises an error, because a feature step is missing its implementation.
 
@@ -12,9 +14,18 @@ defmodule Cabbage.Feature.MissingStepError do
   @single_quote_regex ~r/'[^']+'/
   @double_quote_regex ~r/"[^"]+"/
 
-  def exception(step_text: step_text, step_type: step_type, extra_vars: extra_vars) do
+  def exception(step: step) do
+    extra_vars = %{table: step.table_data, doc_string: step.doc_string}
+
+    step_type =
+      case step do
+        %Steps.Given{} -> :given
+        %Steps.When{} -> :when
+        %Steps.Then{} -> :then
+      end
+
     {converted_step_text, list_of_vars} =
-      {step_text, []}
+      {step.text, []}
       |> convert_nums()
       |> convert_double_quote_strings()
       |> convert_single_quote_strings()
@@ -24,9 +35,9 @@ defmodule Cabbage.Feature.MissingStepError do
 
     message = """
     Please add a matching step for:
-    "#{step_type} #{step_text}"
+    "#{step_type} #{step.text}"
 
-      def#{step_type |> String.downcase()} ~r/^#{converted_step_text}$/, #{map_of_vars}, state do
+      def#{step_type |> Atom.to_string() |> String.downcase()} ~r/^#{converted_step_text}$/, #{map_of_vars}, _state do
         # Your implementation here
       end
     """

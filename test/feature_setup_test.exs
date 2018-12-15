@@ -6,10 +6,10 @@ defmodule Cabbage.FeatureSetupTest do
   describe "Features can import steps from other features" do
     test "ignores wrong setup" do
       defmodule FeatureSetupTest do
-        use Cabbage.Feature, file: "simplest.feature"
+        use Cabbage.FeatureCase, feature: "simplest.feature"
         @moduletag :another_module_tag
 
-        tag @another_module_tag do
+        setup_tag @another_module_tag, _state do
           4
         end
 
@@ -24,10 +24,10 @@ defmodule Cabbage.FeatureSetupTest do
 
     test "uses correct setup" do
       defmodule FeatureSetupTest1 do
-        use Cabbage.Feature, file: "simplest.feature"
+        use Cabbage.FeatureCase, feature: "simplest.feature"
         @moduletag :module_tag
 
-        tag @module_tag do
+        setup_tag @module_tag, _state do
           {:ok, %{module_state: "state"}}
         end
 
