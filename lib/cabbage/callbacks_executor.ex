@@ -1,6 +1,5 @@
 defmodule Cabbage.CallbacksExecutor do
-  alias Gherkin.Elements.Scenario
-  alias Cabbage.{ImplementedStep, MissingStepError, StepsManager}
+  alias Cabbage.MissingStepError
 
   def execute_tests_callbacks(steps, state, implemented_steps) when is_list(steps) do
     Enum.reduce(steps, state, &execute_tests_callbacks(&1, &2, implemented_steps))
@@ -26,7 +25,7 @@ defmodule Cabbage.CallbacksExecutor do
     end
   end
 
-  defp execute_first_matching_callback(context, state, []), do: {:error, :no_match}
+  defp execute_first_matching_callback(_context, _state, []), do: {:error, :no_match}
 
   defp execute_first_matching_callback(context, state, [callback | rest]) do
     case callback.(context, state) do

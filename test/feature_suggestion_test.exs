@@ -2,14 +2,11 @@ Code.require_file("test_helper.exs", __DIR__)
 
 defmodule Cabbage.FeatureSuggestionTest do
   use ExUnit.Case
-  @moduletag :skip
-
-  alias Cabbage.Feature.MissingStepError
 
   describe "provide simple missing steps" do
     test "Show missing Given step" do
       message = """
-      Please add a matching step for:
+      ** (Cabbage.MissingStepError) Please add a matching step for:
       "Given I provide Given"
 
         defgiven ~r/^I provide Given$/, _vars, state do
@@ -17,11 +14,13 @@ defmodule Cabbage.FeatureSuggestionTest do
         end
       """
 
-      assert_raise MissingStepError, message, fn ->
-        defmodule FeatureSuggestionTest do
-          use Cabbage.FeatureCase, feature: "simple.feature"
-        end
+      defmodule FeatureSuggestionTest do
+        use Cabbage.FeatureCase, feature: "simple.feature"
       end
+
+      {result, output} = CabbageTestHelper.run()
+      assert result == %{failures: 1, skipped: 0, total: 1, excluded: 0}
+      assert output =~ String.replace(message, "\n", "\n     ")
     end
 
     test "Show missing And step" do
@@ -34,15 +33,17 @@ defmodule Cabbage.FeatureSuggestionTest do
         end
       """
 
-      assert_raise MissingStepError, message, fn ->
-        defmodule FeatureSuggestionTest2 do
-          use Cabbage.FeatureCase, feature: "simple.feature"
+      defmodule FeatureSuggestionTest2 do
+        use Cabbage.FeatureCase, feature: "simple.feature"
 
-          defgiven ~r/^I provide Given$/, _vars, _state do
-            # Your implementation here
-          end
+        defgiven ~r/^I provide Given$/, _vars, _state do
+          # Your implementation here
         end
       end
+
+      {result, output} = CabbageTestHelper.run()
+      assert result == %{failures: 1, skipped: 0, total: 1, excluded: 0}
+      assert output =~ String.replace(message, "\n", "\n     ")
     end
 
     test "Show missing When step" do
@@ -55,19 +56,21 @@ defmodule Cabbage.FeatureSuggestionTest do
         end
       """
 
-      assert_raise MissingStepError, message, fn ->
-        defmodule FeatureSuggestionTest3 do
-          use Cabbage.FeatureCase, feature: "simple.feature"
+      defmodule FeatureSuggestionTest3 do
+        use Cabbage.FeatureCase, feature: "simple.feature"
 
-          defgiven ~r/^I provide Given$/, _vars, _state do
-            # Your implementation here
-          end
+        defgiven ~r/^I provide Given$/, _vars, _state do
+          # Your implementation here
+        end
 
-          defgiven ~r/^I provide And$/, _vars, _state do
-            # Your implementation here
-          end
+        defgiven ~r/^I provide And$/, _vars, _state do
+          # Your implementation here
         end
       end
+
+      {result, output} = CabbageTestHelper.run()
+      assert result == %{failures: 1, skipped: 0, total: 1, excluded: 0}
+      assert output =~ String.replace(message, "\n", "\n     ")
     end
 
     test "Show missing Then step" do
@@ -80,23 +83,25 @@ defmodule Cabbage.FeatureSuggestionTest do
         end
       """
 
-      assert_raise MissingStepError, message, fn ->
-        defmodule FeatureSuggestionTest4 do
-          use Cabbage.FeatureCase, feature: "simple.feature"
+      defmodule FeatureSuggestionTest4 do
+        use Cabbage.FeatureCase, feature: "simple.feature"
 
-          defgiven ~r/^I provide Given$/, _vars, _state do
-            # Your implementation here
-          end
+        defgiven ~r/^I provide Given$/, _vars, _state do
+          # Your implementation here
+        end
 
-          defgiven ~r/^I provide And$/, _vars, _state do
-            # Your implementation here
-          end
+        defgiven ~r/^I provide And$/, _vars, _state do
+          # Your implementation here
+        end
 
-          defwhen ~r/^I provide When$/, _vars, _state do
-            # Your implementation here
-          end
+        defwhen ~r/^I provide When$/, _vars, _state do
+          # Your implementation here
         end
       end
+
+      {result, output} = CabbageTestHelper.run()
+      assert result == %{failures: 1, skipped: 0, total: 1, excluded: 0}
+      assert output =~ String.replace(message, "\n", "\n     ")
     end
 
     test "Doesnt suggest any features" do
@@ -136,11 +141,13 @@ defmodule Cabbage.FeatureSuggestionTest do
         end
       """
 
-      assert_raise MissingStepError, message, fn ->
-        defmodule FeatureSuggestionTest6 do
-          use Cabbage.FeatureCase, feature: "dynamic.feature"
-        end
+      defmodule FeatureSuggestionTest6 do
+        use Cabbage.FeatureCase, feature: "dynamic.feature"
       end
+
+      {result, output} = CabbageTestHelper.run()
+      assert result == %{failures: 1, skipped: 0, total: 1, excluded: 0}
+      assert output =~ String.replace(message, "\n", "\n     ")
     end
 
     test "Show missing dynamic When step with two dynamic parts" do
@@ -153,15 +160,17 @@ defmodule Cabbage.FeatureSuggestionTest do
         end
       """
 
-      assert_raise MissingStepError, message, fn ->
-        defmodule FeatureSuggestionTest7 do
-          use Cabbage.FeatureCase, feature: "dynamic.feature"
+      defmodule FeatureSuggestionTest7 do
+        use Cabbage.FeatureCase, feature: "dynamic.feature"
 
-          defgiven ~r/^I provide Given with \'(?<string_1>[^\']+)\' part$/, %{string_1: _string_1}, _state do
-            # Your implementation here
-          end
+        defgiven ~r/^I provide Given with \'(?<string_1>[^\']+)\' part$/, %{string_1: _string_1}, _state do
+          # Your implementation here
         end
       end
+
+      {result, output} = CabbageTestHelper.run()
+      assert result == %{failures: 1, skipped: 0, total: 1, excluded: 0}
+      assert output =~ String.replace(message, "\n", "\n     ")
     end
 
     test "Show missing dynamic Then step with two dynamic parts one of which is docs" do
@@ -174,21 +183,23 @@ defmodule Cabbage.FeatureSuggestionTest do
         end
       """
 
-      assert_raise MissingStepError, message, fn ->
-        defmodule FeatureSuggestionTest8 do
-          use Cabbage.FeatureCase, feature: "dynamic.feature"
+      defmodule FeatureSuggestionTest8 do
+        use Cabbage.FeatureCase, feature: "dynamic.feature"
 
-          defgiven ~r/^I provide Given with \'(?<string_1>[^\']+)\' part$/, %{string_1: string_1}, state do
-            # Your implementation here
-          end
+        defgiven ~r/^I provide Given with \'(?<string_1>[^\']+)\' part$/, %{string_1: _string_1}, _state do
+          # Your implementation here
+        end
 
-          defwhen ~r/^I provide When with \"(?<string_1>[^\"]+)\" part and with one more \"(?<string_2>[^\"]+)\" part$/,
-                  %{string_1: _string_1, string_2: _string_2},
-                  _state do
-            # Your implementation here
-          end
+        defwhen ~r/^I provide When with \"(?<string_1>[^\"]+)\" part and with one more \"(?<string_2>[^\"]+)\" part$/,
+                %{string_1: _string_1, string_2: _string_2},
+                _state do
+          # Your implementation here
         end
       end
+
+      {result, output} = CabbageTestHelper.run()
+      assert result == %{failures: 1, skipped: 0, total: 1, excluded: 0}
+      assert output =~ String.replace(message, "\n", "\n     ")
     end
 
     test "Show missing dynamic And step with three dynamic parts one of which is docs" do
@@ -201,27 +212,29 @@ defmodule Cabbage.FeatureSuggestionTest do
         end
       """
 
-      assert_raise MissingStepError, message, fn ->
-        defmodule FeatureSuggestionTest9 do
-          use Cabbage.FeatureCase, feature: "dynamic.feature"
+      defmodule FeatureSuggestionTest9 do
+        use Cabbage.FeatureCase, feature: "dynamic.feature"
 
-          defgiven ~r/^I provide Given with \'(?<string_1>[^\']+)\' part$/, %{string_1: _string_1}, _state do
-            # Your implementation here
-          end
+        defgiven ~r/^I provide Given with \'(?<string_1>[^\']+)\' part$/, %{string_1: _string_1}, _state do
+          # Your implementation here
+        end
 
-          defwhen ~r/^I provide When with \"(?<string_1>[^\"]+)\" part and with one more \"(?<string_2>[^\"]+)\" part$/,
-                  %{string_1: _string_1, string_2: _string_2},
-                  _state do
-            # Your implementation here
-          end
+        defwhen ~r/^I provide When with \"(?<string_1>[^\"]+)\" part and with one more \"(?<string_2>[^\"]+)\" part$/,
+                %{string_1: _string_1, string_2: _string_2},
+                _state do
+          # Your implementation here
+        end
 
-          defthen ~r/^I provide Then with number (?<number_1>\d+) part and with docs part$/,
-                  %{number_1: _number_1, doc_string: _doc_string},
-                  _state do
-            # Your implementation here
-          end
+        defthen ~r/^I provide Then with number (?<number_1>\d+) part and with docs part$/,
+                %{number_1: _number_1, doc_string: _doc_string},
+                _state do
+          # Your implementation here
         end
       end
+
+      {result, output} = CabbageTestHelper.run()
+      assert result == %{failures: 1, skipped: 0, total: 1, excluded: 0}
+      assert output =~ String.replace(message, "\n", "\n     ")
     end
 
     test "Do not show suggested items if all present" do
@@ -260,21 +273,21 @@ defmodule Cabbage.FeatureSuggestionTest do
     @doc """
     TODO: Outline values aren't patternmatched to be dynamic when they are strign values
     """
-    test "Show missing dynamic Given step" do
-      message = """
-      Please add a matching step for:
-      "Given there is given a value"
-
-        defgiven ~r/^there is given a value$/, _vars, state do
-          # Your implementation here
-        end
-      """
-
-      assert_raise MissingStepError, message, fn ->
-        defmodule FeatureSuggestionTest11 do
-          use Cabbage.FeatureCase, feature: "outline.feature"
-        end
-      end
-    end
+    # test "Show missing dynamic Given step" do
+    #   message = """
+    #   Please add a matching step for:
+    #   "Given there is given a value"
+    #
+    #     defgiven ~r/^there is given a value$/, _vars, state do
+    #       # Your implementation here
+    #     end
+    #   """
+    #
+    #   assert_raise MissingStepError, message, fn ->
+    #     defmodule FeatureSuggestionTest11 do
+    #       use Cabbage.FeatureCase, feature: "outline.feature"
+    #     end
+    #   end
+    # end
   end
 end

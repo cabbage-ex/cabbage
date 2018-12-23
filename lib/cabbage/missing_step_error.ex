@@ -19,9 +19,9 @@ defmodule Cabbage.MissingStepError do
 
     step_type =
       case step do
-        %Steps.Given{} -> :given
-        %Steps.When{} -> :when
-        %Steps.Then{} -> :then
+        %Steps.Given{} -> "Given"
+        %Steps.When{} -> "When"
+        %Steps.Then{} -> "Then"
       end
 
     {converted_step_text, list_of_vars} =
@@ -37,7 +37,7 @@ defmodule Cabbage.MissingStepError do
     Please add a matching step for:
     "#{step_type} #{step.text}"
 
-      def#{step_type |> Atom.to_string() |> String.downcase()} ~r/^#{converted_step_text}$/, #{map_of_vars}, _state do
+      def#{step_type |> String.downcase()} ~r/^#{converted_step_text}$/, #{map_of_vars}, state do
         # Your implementation here
       end
     """
