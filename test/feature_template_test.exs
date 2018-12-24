@@ -17,7 +17,7 @@ defmodule Cabbage.FeatureTestTest do
     end
 
     defmodule FeatureTimeoutTest do
-      use Cabbage.FeatureCase, feature: "simplest.feature", test_case: CustomTemplate
+      use Cabbage.Case, feature: "simplest.feature", test_case: CustomTemplate
 
       defthen ~r/^I provide Then$/, _vars, state do
         assert state.case_template == CustomTemplate

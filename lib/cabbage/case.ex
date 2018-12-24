@@ -1,35 +1,76 @@
-defmodule Cabbage.FeatureCase do
-  alias Cabbage.{CallbacksExecutor, Loader, OptionsManager, StepsManager}
+defmodule Cabbage.Case do
+  @moduledoc """
+  An extension on ExUnit to be able to execute feature files.
+  """
+
+  alias Cabbage.{Loader, Config, SetupsManager, StepsManager}
   alias Gherkin.Elements.Scenario
   alias Macro.Env
 
   defmacro __using__(options), do: using(__CALLER__, options)
   defmacro __before_compile__(env), do: before_compile(env)
 
+  @doc """
+  Registers `given` step callback.
+
+      defgiven ~r/Regex goes here/, _matched_data, _test_state do
+        # Your implementation here
+      end
+  """
   defmacro defgiven(regex, parameters, state, do: block) do
     register_step_callback(__CALLER__, :given, regex, parameters, state, block)
   end
 
+  @doc """
+  Registers `when` step callback.
+
+      defwhen ~r/Regex goes here/, _matched_data, _test_state do
+        # Your implementation here
+      end
+  """
   defmacro defwhen(regex, parameters, state, do: block) do
     register_step_callback(__CALLER__, :when, regex, parameters, state, block)
   end
 
+  @doc """
+  Registers `then` step callback.
+
+      defthen ~r/Regex goes here/, _matched_data, _test_state do
+        # Your implementation here
+      end
+  """
   defmacro defthen(regex, parameters, state, do: block) do
     register_step_callback(__CALLER__, :then, regex, parameters, state, block)
   end
 
+  @doc """
+  Add an ExUnit `setup/1` callback that only fires for the scenarios that are tagged.
+
+      setup_tag @tag, _test_state do
+        # Your implementation here
+      end
+  """
   defmacro setup_tag(tag, state, do: block) do
     register_tag_callback(__CALLER__, tag, state, block)
   end
 
+  @doc """
+  Import defined steps from other module that uses `Cabbage.Case`.
+  """
   defmacro import_steps(module) do
     import_from_other_feature(__CALLER__, module, [:steps])
   end
 
+  @doc """
+  Import defined tag setups from other module that uses `Cabbage.Case`.
+  """
   defmacro import_tags_setups(module) do
     import_from_other_feature(__CALLER__, module, [:setups])
   end
 
+  @doc """
+  Import both step and setup definitions from other module that uses `Cabbage.Case`.
+  """
   defmacro import_feature(module) do
     import_from_other_feature(__CALLER__, module, [:steps, :setups])
   end
@@ -43,7 +84,7 @@ defmodule Cabbage.FeatureCase do
       @before_compile unquote(__MODULE__)
       import unquote(__MODULE__)
 
-      use unquote(OptionsManager.test_case(options))
+      use unquote(Config.test_case(options)), unquote(Config.test_case_options(options))
     end
   end
 
@@ -67,29 +108,29 @@ defmodule Cabbage.FeatureCase do
   defp register_feature_tests(%Env{} = env) do
     options = Module.get_attribute(env.module, :options)
 
-    if OptionsManager.has_feature?(options) do
+    if Config.has_feature?(options) do
       feature =
         options
-        |> OptionsManager.feature_path()
+        |> Config.feature_path()
         |> Loader.load_from_file()
 
-      implemented_steps = Module.get_attribute(env.module, :steps) |> Enum.reverse()
-      implemented_setups = Module.get_attribute(env.module, :setups) |> Enum.reverse()
+      steps_callbacks = Module.get_attribute(env.module, :steps) |> Enum.reverse()
+      setups_callbacks = Module.get_attribute(env.module, :setups) |> Enum.reverse()
 
       feature.scenarios
-      |> Enum.map(&%{&1 | tags: OptionsManager.tags(options, &1.tags)})
-      |> Enum.map(&register_scenario_test(&1, feature, {implemented_setups, implemented_steps}, env))
+      |> Enum.map(&%{&1 | tags: Config.tags(options, &1.tags)})
+      |> Enum.map(&register_scenario_test(&1, feature, {setups_callbacks, steps_callbacks}, env))
     end
   end
 
   defp register_scenario_test(%Scenario{} = scenario, _feature, {setups, steps}, %Env{} = env) do
     env = %{env | line: scenario.line}
-    name = ExUnit.Case.register_test(env, :test, scenario.name, scenario.tags)
+    name = ExUnit.Case.register_test(env, :test, scenario.name, SetupsManager.normalize_tags_for_test(scenario.tags))
 
     quote do
       def unquote(name)(state) do
-        state = CallbacksExecutor.execute_setups_callbacks(unquote(scenario.tags), state, unquote(setups))
-        _state = CallbacksExecutor.execute_tests_callbacks(unquote(Macro.escape(scenario.steps)), state, unquote(steps))
+        state = Enum.reduce(unquote(scenario.tags), state, &SetupsManager.execute(&1, &2, unquote(setups)))
+        Enum.reduce(unquote(Macro.escape(scenario.steps)), state, &StepsManager.execute(&1, &2, unquote(steps)))
       end
     end
   end
@@ -117,7 +158,7 @@ defmodule Cabbage.FeatureCase do
     callback =
       quote generated: true do
         fn executing_tag, test_state ->
-          with ^executing_tag <- unquote(tag),
+          with true <- SetupsManager.are_tags_equal?(unquote(tag), executing_tag),
                unquote(state_pattern) <- test_state do
             unquote(block)
           else

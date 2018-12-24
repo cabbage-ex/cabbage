@@ -1,12 +1,22 @@
 defmodule Cabbage.Loader do
+  @moduledoc """
+  Can load and parse feature files and raw strings.
+  """
+
   alias Gherkin.Elements.{Feature, Scenario, Steps}
 
+  @doc """
+  Loads and parses feature from file
+  """
   def load_from_file(path) do
     path
     |> File.read!()
     |> load_from_string()
   end
 
+  @doc """
+  Loads and parses feature from string
+  """
   def load_from_string(string) do
     string
     |> Gherkin.parse()

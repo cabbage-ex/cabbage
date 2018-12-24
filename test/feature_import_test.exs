@@ -6,11 +6,11 @@ defmodule Cabbage.FeatureImportTest do
   describe "Features can import steps from other features" do
     test "can import empty steps" do
       defmodule FeatureImportableTest do
-        use Cabbage.FeatureCase
+        use Cabbage.Case
       end
 
       defmodule FeatureImporterTest do
-        use Cabbage.FeatureCase, feature: "simplest.feature"
+        use Cabbage.Case, feature: "simplest.feature"
         import_steps(FeatureImportableTest)
 
         defthen ~r/^I provide Then$/, _vars, _state do
@@ -23,14 +23,14 @@ defmodule Cabbage.FeatureImportTest do
 
     test "can import all steps" do
       defmodule FeatureImportableTest2 do
-        use Cabbage.FeatureCase
+        use Cabbage.Case
 
         defthen ~r/^I provide Then$/, _vars, _state do
         end
       end
 
       defmodule FeatureImporterTest2 do
-        use Cabbage.FeatureCase, feature: "simplest.feature"
+        use Cabbage.Case, feature: "simplest.feature"
         import_steps(FeatureImportableTest2)
       end
 
@@ -40,7 +40,7 @@ defmodule Cabbage.FeatureImportTest do
 
     test "can work together with imported steps" do
       defmodule FeatureImportableTest3 do
-        use Cabbage.FeatureCase
+        use Cabbage.Case
 
         defgiven ~r/^I provide Given$/, _vars, %{state: state} do
           {:ok, %{state: state + 1}}
@@ -52,7 +52,7 @@ defmodule Cabbage.FeatureImportTest do
       end
 
       defmodule FeatureImporterTest3 do
-        use Cabbage.FeatureCase, feature: "simple.feature"
+        use Cabbage.Case, feature: "simple.feature"
         import_steps(FeatureImportableTest3)
 
         setup do
@@ -76,11 +76,11 @@ defmodule Cabbage.FeatureImportTest do
   describe "Features can import tags from other features" do
     test "can import empty tags" do
       defmodule FeatureImportableTest4 do
-        use Cabbage.FeatureCase
+        use Cabbage.Case
       end
 
       defmodule FeatureImporterTest4 do
-        use Cabbage.FeatureCase, feature: "simplest.feature"
+        use Cabbage.Case, feature: "simplest.feature"
         import_tags_setups(FeatureImportableTest4)
 
         defthen ~r/^I provide Then$/, _vars, _state do
@@ -93,7 +93,7 @@ defmodule Cabbage.FeatureImportTest do
 
     test "can import provided tags" do
       defmodule FeatureImportableTest5 do
-        use Cabbage.FeatureCase
+        use Cabbage.Case
 
         setup_tag @module_tag, _state do
           {:ok, %{module_state: "state"}}
@@ -101,7 +101,7 @@ defmodule Cabbage.FeatureImportTest do
       end
 
       defmodule FeatureImporterTest5 do
-        use Cabbage.FeatureCase, feature: "simplest.feature"
+        use Cabbage.Case, feature: "simplest.feature"
         @moduletag :module_tag
         import_tags_setups(FeatureImportableTest5)
 
@@ -118,7 +118,7 @@ defmodule Cabbage.FeatureImportTest do
   describe "Features can import whole features" do
     test "can import whole features" do
       defmodule FeatureImportableTest6 do
-        use Cabbage.FeatureCase
+        use Cabbage.Case
 
         setup_tag @module_tag, _state do
           {:ok, %{state: 10}}
@@ -134,7 +134,7 @@ defmodule Cabbage.FeatureImportTest do
       end
 
       defmodule FeatureImporterTest6 do
-        use Cabbage.FeatureCase, feature: "simple.feature"
+        use Cabbage.Case, feature: "simple.feature"
         import_feature(FeatureImportableTest6)
         @moduletag :module_tag
 

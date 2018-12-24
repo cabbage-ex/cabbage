@@ -6,7 +6,7 @@ defmodule Cabbage.FeatureSetupTest do
   describe "Features can import steps from other features" do
     test "ignores wrong setup" do
       defmodule FeatureSetupTest do
-        use Cabbage.FeatureCase, feature: "simplest.feature"
+        use Cabbage.Case, feature: "simplest.feature"
         @moduletag :another_module_tag
 
         setup_tag @another_module_tag, _state do
@@ -24,7 +24,7 @@ defmodule Cabbage.FeatureSetupTest do
 
     test "uses correct setup" do
       defmodule FeatureSetupTest1 do
-        use Cabbage.FeatureCase, feature: "simplest.feature"
+        use Cabbage.Case, feature: "simplest.feature"
         @moduletag :module_tag
 
         setup_tag @module_tag, _state do

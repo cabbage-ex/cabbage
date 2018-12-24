@@ -15,7 +15,7 @@ defmodule Cabbage.FeatureSuggestionTest do
       """
 
       defmodule FeatureSuggestionTest do
-        use Cabbage.FeatureCase, feature: "simple.feature"
+        use Cabbage.Case, feature: "simple.feature"
       end
 
       {result, output} = CabbageTestHelper.run()
@@ -34,7 +34,7 @@ defmodule Cabbage.FeatureSuggestionTest do
       """
 
       defmodule FeatureSuggestionTest2 do
-        use Cabbage.FeatureCase, feature: "simple.feature"
+        use Cabbage.Case, feature: "simple.feature"
 
         defgiven ~r/^I provide Given$/, _vars, _state do
           # Your implementation here
@@ -57,7 +57,7 @@ defmodule Cabbage.FeatureSuggestionTest do
       """
 
       defmodule FeatureSuggestionTest3 do
-        use Cabbage.FeatureCase, feature: "simple.feature"
+        use Cabbage.Case, feature: "simple.feature"
 
         defgiven ~r/^I provide Given$/, _vars, _state do
           # Your implementation here
@@ -84,7 +84,7 @@ defmodule Cabbage.FeatureSuggestionTest do
       """
 
       defmodule FeatureSuggestionTest4 do
-        use Cabbage.FeatureCase, feature: "simple.feature"
+        use Cabbage.Case, feature: "simple.feature"
 
         defgiven ~r/^I provide Given$/, _vars, _state do
           # Your implementation here
@@ -106,7 +106,7 @@ defmodule Cabbage.FeatureSuggestionTest do
 
     test "Doesnt suggest any features" do
       defmodule FeatureSuggestionTest5 do
-        use Cabbage.FeatureCase, feature: "simple.feature"
+        use Cabbage.Case, feature: "simple.feature"
 
         defgiven ~r/^I provide Given$/, _vars, _state do
           # Your implementation here
@@ -142,7 +142,7 @@ defmodule Cabbage.FeatureSuggestionTest do
       """
 
       defmodule FeatureSuggestionTest6 do
-        use Cabbage.FeatureCase, feature: "dynamic.feature"
+        use Cabbage.Case, feature: "dynamic.feature"
       end
 
       {result, output} = CabbageTestHelper.run()
@@ -161,7 +161,7 @@ defmodule Cabbage.FeatureSuggestionTest do
       """
 
       defmodule FeatureSuggestionTest7 do
-        use Cabbage.FeatureCase, feature: "dynamic.feature"
+        use Cabbage.Case, feature: "dynamic.feature"
 
         defgiven ~r/^I provide Given with \'(?<string_1>[^\']+)\' part$/, %{string_1: _string_1}, _state do
           # Your implementation here
@@ -184,7 +184,7 @@ defmodule Cabbage.FeatureSuggestionTest do
       """
 
       defmodule FeatureSuggestionTest8 do
-        use Cabbage.FeatureCase, feature: "dynamic.feature"
+        use Cabbage.Case, feature: "dynamic.feature"
 
         defgiven ~r/^I provide Given with \'(?<string_1>[^\']+)\' part$/, %{string_1: _string_1}, _state do
           # Your implementation here
@@ -213,7 +213,7 @@ defmodule Cabbage.FeatureSuggestionTest do
       """
 
       defmodule FeatureSuggestionTest9 do
-        use Cabbage.FeatureCase, feature: "dynamic.feature"
+        use Cabbage.Case, feature: "dynamic.feature"
 
         defgiven ~r/^I provide Given with \'(?<string_1>[^\']+)\' part$/, %{string_1: _string_1}, _state do
           # Your implementation here
@@ -239,7 +239,7 @@ defmodule Cabbage.FeatureSuggestionTest do
 
     test "Do not show suggested items if all present" do
       defmodule FeatureSuggestionTest10 do
-        use Cabbage.FeatureCase, feature: "dynamic.feature"
+        use Cabbage.Case, feature: "dynamic.feature"
 
         defgiven ~r/^I provide Given with \'(?<string_1>[^\']+)\' part$/, %{string_1: _string_1}, _state do
           # Your implementation here
@@ -285,7 +285,7 @@ defmodule Cabbage.FeatureSuggestionTest do
     #
     #   assert_raise MissingStepError, message, fn ->
     #     defmodule FeatureSuggestionTest11 do
-    #       use Cabbage.FeatureCase, feature: "outline.feature"
+    #       use Cabbage.Case, feature: "outline.feature"
     #     end
     #   end
     # end

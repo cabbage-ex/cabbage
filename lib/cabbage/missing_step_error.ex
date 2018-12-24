@@ -1,12 +1,12 @@
 defmodule Cabbage.MissingStepError do
-  alias Gherkin.Elements.Steps
-
   @moduledoc """
   Raises an error, because a feature step is missing its implementation.
 
   The message of the error will give the user a useful code snippet where
   variables in feature steps are converted to regex capture groups.
   """
+
+  alias Gherkin.Elements.Steps
 
   defexception [:message]
 
