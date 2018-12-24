@@ -1,22 +1,20 @@
 defmodule Cabbage.Mixfile do
   use Mix.Project
 
-  @version "0.3.6"
+  @version "0.4.0"
+  @url "https://github.com/cabbage-ex/cabbage"
   def project do
     [
       app: :cabbage,
       version: @version,
-      elixir: "~> 1.3",
-      source_url: "git@github.com:cabbage-ex/cabbage.git",
-      homepage_url: "https://github.com/cabbage-ex/cabbage",
+      elixir: "~> 1.7",
+      source_url: @url,
+      homepage_url: @url,
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       description: "Story BDD tool for executing elixir in ExUnit",
-      docs: [
-        main: Cabbage,
-        readme: "README.md"
-      ],
+      docs: docs(),
       package: package(),
       deps: deps(),
       aliases: aliases()
@@ -48,6 +46,18 @@ defmodule Cabbage.Mixfile do
       {:gherkin, "~> 1.6"},
       {:ex_doc, "~> 0.19", only: :dev},
       {:earmark, "~> 1.2", only: :dev}
+    ]
+  end
+
+  defp docs() do
+    [
+      main: "readme",
+      source_ref: "v#{@version}",
+      source_url: @url,
+      extras: [
+        "README.md",
+        "CHANGELOG.md"
+      ]
     ]
   end
 

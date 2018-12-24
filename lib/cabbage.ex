@@ -1,2 +1,0 @@
-defmodule Cabbage do
-end

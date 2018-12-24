@@ -6,7 +6,7 @@ volumes:
 
 services:
   cabbage:
-    image: elixir:1.4
+    image: elixir:1.7
     entrypoint: mix
     command: do local.hex --force, deps.get, deps.compile, test --only integration
     environment:
@@ -16,4 +16,3 @@ services:
       - .:/code
       - build:/code/_build
       - deps:/code/deps
-
