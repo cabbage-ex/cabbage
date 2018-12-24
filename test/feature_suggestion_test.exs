@@ -178,7 +178,7 @@ defmodule Cabbage.FeatureSuggestionTest do
       Please add a matching step for:
       "Then I provide Then with number 6 part and with docs part\"
 
-        defthen ~r/^I provide Then with number (?<number_1>\d+) part and with docs part$/, %{number_1: number_1, doc_string: doc_string}, state do
+        defthen ~r/^I provide Then with number (?<number_1>\\d+) part and with docs part$/, %{number_1: number_1, doc_string: doc_string}, state do
           # Your implementation here
         end
       """

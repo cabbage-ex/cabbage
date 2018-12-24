@@ -85,7 +85,7 @@ defmodule Cabbage.MissingStepError do
     join_regex_split(tail, count + 1, type, {step_text, vars})
   end
 
-  defp get_regex_capture_string(:number, count), do: ~s/ (?<number_#{count}>\d+) /
+  defp get_regex_capture_string(:number, count), do: ~s/ (?<number_#{count}>\\d+) /
   defp get_regex_capture_string(:single_quote_string, count), do: ~s/'(?<string_#{count}>[^']+)'/
   defp get_regex_capture_string(:double_quote_string, count), do: ~s/"(?<string_#{count}>[^"]+)"/
 

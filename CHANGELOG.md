@@ -10,6 +10,7 @@
 - Breaks: tests doesn't have default tag `@integration` assigned. Can assign via `global_tags`.
 - Added: Can provide global base test case. `base_path` key in config.
 - Added: Can provide multiple implementations for single step. Will use first one that pattern-matches
+- Added: Register `@moduletag` defined tags for each test within module
 
 ### v0.3.4-dev
 

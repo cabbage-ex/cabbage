@@ -8,61 +8,78 @@ defmodule Cabbage.Case do
 
   Given you have `coffee.feature` file
 
-      Feature: Can serve coffee
+  ```gherkin
+  Feature: Serve coffee
+    Coffee should not be served until paid for
+    Coffee should not be served until the button has been pressed
+    If there is no coffee left then money should be refunded
 
-        Scenario: Can serve coffee
-          Given customer has money
-          When customer paid for money
-          Then consumer got coffee
+    Scenario: Buy last coffee
+      Given there are 1 coffees left in the machine
+      And I have deposited £1
+      When I press the coffee button
+      Then I should be served a coffee
+  ```
 
   When you create coresponding feature test case module which references `coffee.feature`
   you don't have to define all steps. Cabbage will suggest missing steps implementations.
 
       defmodule MyApp.CoffeeTest do
-        use Cabbage.Case, feature: "coffee.feature"
+        use Cabbage.Case, feature: "coffee.feature", async: false
       end
 
   When running `mix test` you will get error. Cabbage will not only tell you that step implementation is missing,
   but also suggest code for your missing step:
 
       ** (Cabbage.MissingStepError) Please add a matching step for:
-      "Given customer has money"
+      "Given there are 1 coffees left in the machine"
 
-        defgiven ~r/^customer has money$/, _vars, state do
+        defgiven ~r/^there are (?<number_1>\\d+) coffees left in the machine$/, %{number_1: number_1}, state do
           # Your implementation here
         end
 
   Eventually filling all missing step implementations and providing logic for each of them
 
       defmodule Cabbage.CoffeeTest do
-        use Cabbage.Case, feature: "coffee.feature"
+        use Cabbage.Case, feature: "coffee.feature", async: false
 
-        defgiven ~r/^customer has money$/, _vars, _state do
-          {:ok, %{customer_money: 1.5}}
+        defgiven ~r/^there are (?<count>\\d+) coffees left in the machine$/, %{count: count}, _state do
+          {:ok, %{coffees_count: String.to_integer(count)}}
         end
 
-        defwhen ~r/^customer paid for coffee$/, _vars, _state do
-          {:ok, %{paid: true}}
+        defgiven ~r/^I have deposited £(?<amount>\\d+)$/, %{amount: amount}, _state do
+          {:ok, %{money_amount: String.to_integer(amount)}}
         end
 
-        defthen ~r/^consumer got coffee$/, _vars, state do
-          assert state.customer_money == 1.5
-          assert state.paid == true
+        defwhen ~r/^I press the coffee button$/, _vars, _state do
+          {:ok, %{coffee_served: true}}
+        end
+
+        defthen ~r/^I should be served a coffee$/, _vars, state do
+          assert state.coffees_count == 1
+          assert state.money_amount == 1
+          assert state.coffee_served == true
         end
       end
 
   This would rougly translate to
 
       defmodule Cabbage.CoffeeTest do
-        use ExUnit.Case
+        use ExUnit.Case, async: false
 
         test "The name of the scenario here" do
-          state = %{customer_money: 1.5}
-          state = Map.merge(state, %{paid: true})
-          assert state.customer_money == 1.5
-          assert state.paid == true
+          state = %{coffees_count: String.to_integer("1")}
+          state = Map.merge(state, %{money_amount: String.to_integer("1")})
+          state = Map.merge(state, %{coffee_served: true})
+
+          assert state.coffees_count == 1
+          assert state.money_amount == 1
+          assert state.coffee_served == true
         end
       end
+
+  This provides the best of both worlds.
+  Feature files for non-technical users, and an actual test file written in Elixir for developers that have to maintain them.
 
   ## Extracting data from step defninitions
 
@@ -142,6 +159,17 @@ defmodule Cabbage.Case do
   you can use the macros `import_steps/1` and `import_tags/1`.
   This will allow you to be more selective about whats getting included into your integration tests.
   The `import_feature/1` macro simply calls both the `import_steps/1` and `import_tags/1` macros.
+
+  ## Tables & Doc Strings
+
+  Using tables and Doc Strings can be done easily, they are provided through the variables under the names `:table` and `:doc_string`.
+
+  ## Running specific tests
+
+  Typically to run an ExUnit test you would do something like `mix test test/some_test.exs:12` and elixir will automatically load  `test/some_test.exs` for you, but only run the test on line `12`. Since the feature files are being translated into ExUnit at compile time, you'll have to specify the `.exs` file and not the `.feature` file to run. The line numbers are printed out as each test runs (at the `:info` level, so you may need to increase your logger config if you dont see anything). An example is like as follows:
+
+      # Runs scenario of test/features/coffee.feature on line 13
+      mix test test/feature_test.exs:13
   """
 
   alias Cabbage.{Loader, Config, SetupsManager, StepsManager}
