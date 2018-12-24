@@ -1,5 +1,16 @@
 # Changelog
 
+### v0.4.0
+
+- Breaks: `Cabbage.Feature` -> `Cabbage.Case`
+- Breaks: Providing feature file `file:` -> `feature:`. `use Cabbage.Case, feature: "some.feature"`
+- Breaks: features base path key `features` -> `base_path`
+- Breaks: removed `defand/4`. All and steps are converted to context (`given`, `when`, `then`)
+- Breaks: defining tag specifi setups `tag/2` -> `setup_tag/3`
+- Breaks: tests doesn't have default tag `@integration` assigned. Can assign via `global_tags`.
+- Added: Can provide global base test case. `base_path` key in config.
+- Added: Can provide multiple implementations for single step. Will use first one that pattern-matches
+
 ### v0.3.4-dev
 
 - Support for Elixir 1.7 #50.
