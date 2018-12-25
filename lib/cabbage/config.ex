@@ -29,15 +29,13 @@ defmodule Cabbage.Config do
 
   #### Passing options to `ExUnit.Case`
 
-    use Cabbage.Case,
-      feature: "new_feature.feature",
-      test_case: OtherThanExUnit.Case,
-      base_path: "other/path",
-      async: true
+      use Cabbage.Case,
+        feature: "new_feature.feature",
+        async: true
 
-  `:async` will be passed further to `OtherThanExUnit.Case`
+  `:async` and ony other key  will be passed further to `OtherThanExUnit.Case`
 
-      use OtherThanExUnit.Case, async: true
+      use ExUnit.Case, async: true
 
   """
 

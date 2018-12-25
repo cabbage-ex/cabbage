@@ -6,7 +6,7 @@ defmodule Cabbage.Case do
 
   Features are expected to be located in `tests/features` folder (to change location see `Cabbage.Config`).
 
-  Given you have `coffee.feature` file
+  Given you have `coffee.feature` file. Slightly more complex example as provided in [basic usage](https://hexdocs.pm/cabbage/readme.html)
 
   ```gherkin
   Feature: Serve coffee
@@ -21,15 +21,16 @@ defmodule Cabbage.Case do
       Then I should be served a coffee
   ```
 
-  When you create coresponding feature test case module which references `coffee.feature`
-  you don't have to define all steps. Cabbage will suggest missing steps implementations.
+  You create coresponding feature test case module which references `coffee.feature`.
+  You don't have to define all steps at once. Cabbage will suggest missing steps implementations.
 
       defmodule MyApp.CoffeeTest do
         use Cabbage.Case, feature: "coffee.feature", async: false
       end
 
   When running `mix test` you will get error. Cabbage will not only tell you that step implementation is missing,
-  but also suggest code for your missing step:
+  but also suggest code for your missing step.
+  It will try to guess regex, by providing named captures for numbers, and strings in single and double quotes.
 
       ** (Cabbage.MissingStepError) Please add a matching step for:
       "Given there are 1 coffees left in the machine"
@@ -47,6 +48,7 @@ defmodule Cabbage.Case do
           {:ok, %{coffees_count: String.to_integer(count)}}
         end
 
+        # Note that while in *.feature file step is defined as And, here it is definied with defgive
         defgiven ~r/^I have deposited £(?<amount>\\d+)$/, %{amount: amount}, _state do
           {:ok, %{money_amount: String.to_integer(amount)}}
         end
@@ -78,19 +80,25 @@ defmodule Cabbage.Case do
         end
       end
 
+  Ofcourse this is trivial example, in real life you would call functions on modules you want to test.
+
   This provides the best of both worlds.
   Feature files for non-technical users, and an actual test file written in Elixir for developers that have to maintain them.
 
   ## Extracting data from step defninitions
 
   You’ll likely have data within your feature statements which you want to extract.
+
   The second parameter to each of `defgiven/4`, `defwhen/4` and `defthen/4` is named captures from step definition as map.
   For every named capture, you’ll have a key as an atom in the second parameter. You can then use those variables you create within your block.
 
-      # NOTICE THE `number` VARIABLE IS STILL A STRING!!
-      defgiven ~r/^there (is|are) (?<number>+) widget(s?)$/, %{number: number}, _state do
+      defgiven ~r/^there (is|are) (?<number>\\d+) widget(s?)$/, %{number: number}, _state do
         assert String.to_integer(number) >= 1
       end
+
+  > Note that in this and previous example `String.to_integer/1` is used.
+    Even though regex matches numbers, they still are passed in parameters as strings.
+    If needed you can convert it using `String.to_integer/1` or `String.to_float/1`.
 
   ## Modifying state
 
@@ -100,6 +108,7 @@ defmodule Cabbage.Case do
 
   You can setup initial state using plain `ExUnit.Case.setup/1` and `ExUnit.Case.setup_all/1`.
   Whatever state is provided via the ` ExUnit.Case.test/3` macro will be your initial state.
+  Or by using `setup_tag/3` for tag specifi setups/
 
   To update the state, simply return {:ok, %{new: :state}}.
   Note that a Map.merge/2 will be performed for you so only have to specify the keys you want to update.
@@ -115,7 +124,7 @@ defmodule Cabbage.Case do
 
   You may want to reuse several statements you create, especially ones that deal with global logic like users and logging in.
 
-  Feature modules can be created without referencing a file.
+  Feature modules can be created without referencing a feature file.
   This makes them do nothing except hold translations between steps in a scenario and test code to be included into a test.
   These modules must be compiled prior to running the test suite, so for that reason you must add them to the elixirc_paths in your `mix.exs` file, like so:
 
@@ -143,7 +152,7 @@ defmodule Cabbage.Case do
       defmodule MyApp.GlobalFeatures do
         use Cabbage.Feature
 
-        # Write your `defgiven/4`, `defthen/4`, `defwhen/4` and `setup_tag/3`
+        # Write your defgiven/4, defthen/4, defwhen/4 and setup_tag/3
       end
 
   Then inside the test file (the .exs one) add a `import_feature MyApp.GlobalFeatures` line after the use Cabbage.Feature line lke so:
@@ -156,7 +165,7 @@ defmodule Cabbage.Case do
       end
 
   Keep in mind that if you’d like to be more explicit about what you bring into your test,
-  you can use the macros `import_steps/1` and `import_tags/1`.
+  you can use the macros `import_steps/1` and `import_tags_setups/1`.
   This will allow you to be more selective about whats getting included into your integration tests.
   The `import_feature/1` macro simply calls both the `import_steps/1` and `import_tags/1` macros.
 
@@ -164,13 +173,40 @@ defmodule Cabbage.Case do
 
   Using tables and Doc Strings can be done easily, they are provided through the variables under the names `:table` and `:doc_string`.
 
-  ## Running specific tests
+  ```gherkin
+  Feature: Can have complex features
+    Test that can have advanced regular expression line matches and datatables
 
-  Typically to run an ExUnit test you would do something like `mix test test/some_test.exs:12` and elixir will automatically load  `test/some_test.exs` for you, but only run the test on line `12`. Since the feature files are being translated into ExUnit at compile time, you'll have to specify the `.exs` file and not the `.feature` file to run. The line numbers are printed out as each test runs (at the `:info` level, so you may need to increase your logger config if you dont see anything). An example is like as follows:
+    Scenario: Can create scenario with dynamic key ingredients
+      When I provide docs part
+        \"\"\"
+        Here is provided some complex part that is way to complex
+        \"\"\"
+      When I provide table part
+        | Name | Age |
+        | John | 30 |
+        | Ann | 29 |
+  ```
 
-      # Runs scenario of test/features/coffee.feature on line 13
-      mix test test/feature_test.exs:13
+      defmodule FeatureExecutionTest4 do
+        use Cabbage.Case, feature: "dynamic.feature"
+
+        defwhen ~r/^When I provide docs part$/, %{doc_string: doc_string}, _state do
+          assert table == "Here is provided some complex part that is way to complex"
+        end
+
+        defwhen ~r/^When I provide table part$/, %{table: table}, _state do
+          assert table == [%{Age: "30", Name: "John"}, %{Age: "29", Name: "Ann"}]
+        end
+      end
   """
+
+  # ## Running specific tests
+  #
+  # Typically to run an ExUnit test you would do something like `mix test test/some_test.exs:12` and elixir will automatically load  `test/some_test.exs` for you, but only run the test on line `12`. Since the feature files are being translated into ExUnit at compile time, you'll have to specify the `.exs` file and not the `.feature` file to run. The line numbers are printed out as each test runs (at the `:info` level, so you may need to increase your logger config if you dont see anything). An example is like as follows:
+  #
+  #     # Runs scenario of test/features/coffee.feature on line 13
+  #     mix test test/feature_test.exs:13
 
   alias Cabbage.{Loader, Config, SetupsManager, StepsManager}
   alias Gherkin.Elements.Scenario
