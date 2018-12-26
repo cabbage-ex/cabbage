@@ -66,6 +66,6 @@ end
 - [x] Data tables
 - [x] Executing specific tests
 - [x] Tags implementation
-- [ ] Background steps
+- [x] Background steps
 - [ ] Integration Helpers for Wallaby (separate project?)
 - [ ] Integration Helpers for Hound (separate project?)

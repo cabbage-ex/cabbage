@@ -189,4 +189,43 @@ defmodule Cabbage.FeatureExecutionTest do
       assert result == %{failures: 0, skipped: 0, total: 6, excluded: 0}
     end
   end
+
+  describe "Tests with background steps" do
+    test "background steps are executed" do
+      defmodule BackroundFeatureExecutionTest do
+        use Cabbage.Case, feature: "background.feature"
+
+        defgiven ~r/^a background step \"(?<string_1>[^\"]+)\" provided$/, %{string_1: string_1}, _state do
+          {:ok, %{first_background: string_1}}
+        end
+
+        defgiven ~r/^a another step \"(?<string_1>[^\"]+)\" provided$/, %{string_1: string_1}, _state do
+          {:ok, %{second_background: string_1}}
+        end
+
+        defwhen ~r/^step provided in scenario$/, _vars, _state do
+          {:ok, %{regular_step: :regular_step}}
+        end
+
+        defwhen ~r/^another step provided in scenario$/, _vars, state do
+          {:ok, %{another_regular_step: :another_regular_step}}
+        end
+
+        defthen ~r/^all steps should have been taken into account$/, _vars, %{regular_step: _} = state do
+          assert state.first_background == "first step"
+          assert state.second_background == "second step"
+          assert state.regular_step == :regular_step
+        end
+
+        defthen ~r/^all steps should have been taken into account$/, _vars, %{another_regular_step: _} = state do
+          assert state.first_background == "first step"
+          assert state.second_background == "second step"
+          assert state.another_regular_step == :another_regular_step
+        end
+      end
+
+      {result, _output} = CabbageTestHelper.run()
+      assert result == %{failures: 0, skipped: 0, total: 2, excluded: 0}
+    end
+  end
 end

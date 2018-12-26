@@ -269,6 +269,27 @@ defmodule Cabbage.FeatureSuggestionTest do
     end
   end
 
+  describe "provide backgroud missing steps" do
+    test "Show missing dynamic Given step from background" do
+      message = """
+      Please add a matching step for:
+      "Given a background step \"first step\" provided"
+
+        defgiven ~r/^a background step \"(?<string_1>[^\"]+)\" provided$/, %{string_1: string_1}, state do
+          # Your implementation here
+        end
+      """
+
+      defmodule FeatureSuggestionTest11 do
+        use Cabbage.Case, feature: "background.feature"
+      end
+
+      {result, output} = CabbageTestHelper.run(exclude: [:test], include: [line: "8"])
+      assert result == %{failures: 1, skipped: 0, total: 2, excluded: 1}
+      assert output =~ String.replace(message, "\n", "\n     ")
+    end
+  end
+
   describe "provide outline missing steps" do
     @doc """
     TODO: Outline values aren't patternmatched to be dynamic when they are strign values

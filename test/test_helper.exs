@@ -20,6 +20,7 @@ defmodule CabbageTestHelper do
 
     opts =
       ExUnit.configuration()
+      |> Keyword.drop([:exclude, :include])
       |> Keyword.merge(filters)
       |> Keyword.merge(colors: [enabled: false])
 
