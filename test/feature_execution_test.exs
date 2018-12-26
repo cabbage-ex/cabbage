@@ -207,7 +207,7 @@ defmodule Cabbage.FeatureExecutionTest do
           {:ok, %{regular_step: :regular_step}}
         end
 
-        defwhen ~r/^another step provided in scenario$/, _vars, state do
+        defwhen ~r/^another step provided in scenario$/, _vars, _state do
           {:ok, %{another_regular_step: :another_regular_step}}
         end
 
