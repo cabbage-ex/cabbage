@@ -77,7 +77,7 @@ defmodule Cabbage.Config do
     global = Application.fetch_env!(:cabbage, :global_tags) |> List.wrap()
     module = options[:env].module |> Module.get_attribute(:moduletag) |> List.wrap()
 
-    global ++ module ++ extra_tags
+    Enum.uniq(global ++ module ++ extra_tags)
   end
 
   defp base_path(options), do: options[:base_path] || Application.fetch_env!(:cabbage, :base_path)

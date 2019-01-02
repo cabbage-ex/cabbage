@@ -141,47 +141,47 @@ defmodule Cabbage.FeatureExecutionTest do
           {:ok, %{datatable: datatable}}
         end
 
-        defgiven ~r/^there is given (?<string_1>[^\" ]+) value$/, %{string_1: string_1}, %{datatable: datatable} do
-          assert string_1 in Map.keys(datatable)
-          {:ok, %{given_value: string_1}}
+        defgiven ~r/^there is given <given> value$/, %{given: given_value}, %{datatable: datatable} do
+          assert given_value in Map.keys(datatable)
+          {:ok, %{given_value: given_value}}
         end
 
-        defgiven ~r/^there is given numeric (?<number_1>\d+) value$/, %{number_1: number_1}, %{datatable: datatable} do
-          number_1 = String.to_integer(number_1)
-          assert number_1 in Map.keys(datatable)
-          {:ok, %{given_value: number_1}}
+        defgiven ~r/^there is given numeric <given> value$/, %{given: given_value}, %{datatable: datatable} do
+          given_value = String.to_integer(given_value)
+          assert given_value in Map.keys(datatable)
+          {:ok, %{given_value: given_value}}
         end
 
-        defwhen ~r/^there is when (?<string_1>[^\" ]+) value$/, %{string_1: string_1}, %{
+        defwhen ~r/^there is when <when> value$/, %{when: when_value}, %{
           datatable: datatable,
-          given_value: given
+          given_value: given_value
         } do
-          assert string_1 == Map.get(datatable, given)
-          {:ok, %{when_value: string_1}}
+          assert when_value == Map.get(datatable, given_value)
+          {:ok, %{when_value: when_value}}
         end
 
-        defwhen ~r/^there is when numeric (?<number_1>\d+) value$/, %{number_1: number_1}, %{
+        defwhen ~r/^there is when numeric <when> value$/, %{when: when_value}, %{
           datatable: datatable,
-          given_value: given
+          given_value: given_value
         } do
-          number_1 = String.to_integer(number_1)
-          assert number_1 == Map.get(datatable, given)
-          {:ok, %{when_value: number_1}}
+          when_value = String.to_integer(when_value)
+          assert when_value == Map.get(datatable, given_value)
+          {:ok, %{when_value: when_value}}
         end
 
-        defthen ~r/^there is then (?<string_1>[^\" ]+) value$/, %{string_1: string_1}, %{
+        defthen ~r/^there is then <then> value$/, %{then: then_value}, %{
           given_value: given_value,
           when_value: when_value
         } do
-          assert string_1 == given_value <> when_value
+          assert then_value == given_value <> when_value
         end
 
-        defthen ~r/^there is then numeric (?<number_1>\d+) value$/, %{number_1: number_1}, %{
+        defthen ~r/^there is then numeric <then> value$/, %{then: then_value}, %{
           given_value: given_value,
           when_value: when_value
         } do
-          number_1 = String.to_integer(number_1)
-          assert number_1 == given_value + when_value
+          then_value = String.to_integer(then_value)
+          assert then_value == given_value + when_value
         end
       end
 

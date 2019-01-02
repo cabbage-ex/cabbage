@@ -18,10 +18,10 @@ defmodule Cabbage.MissingStepError do
     extra_vars = %{table: step.table_data, doc_string: step.doc_string}
 
     step_type =
-      case step do
-        %Steps.Given{} -> "Given"
-        %Steps.When{} -> "When"
-        %Steps.Then{} -> "Then"
+      case step.type do
+        :given -> "Given"
+        :when -> "When"
+        :then -> "Then"
       end
 
     {converted_step_text, list_of_vars} =

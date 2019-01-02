@@ -208,8 +208,7 @@ defmodule Cabbage.Case do
   #     # Runs scenario of test/features/coffee.feature on line 13
   #     mix test test/feature_test.exs:13
 
-  alias Cabbage.{Loader, Config, SetupsManager, StepsManager}
-  alias Gherkin.Elements.Scenario
+  alias Cabbage.{Loader, Config, FeaturesManager, SetupsManager, StepsManager}
   alias Macro.Env
 
   defmacro __using__(options), do: using(__CALLER__, options)
@@ -314,27 +313,26 @@ defmodule Cabbage.Case do
     options = Module.get_attribute(env.module, :options)
 
     if Config.has_feature?(options) do
-      feature =
-        options
-        |> Config.feature_path()
-        |> Loader.load_from_file()
-
       steps_callbacks = Module.get_attribute(env.module, :steps) |> Enum.reverse()
       setups_callbacks = Module.get_attribute(env.module, :setups) |> Enum.reverse()
 
-      feature.scenarios
-      |> Enum.map(&%{&1 | tags: Config.tags(options, &1.tags)})
-      |> Enum.map(&register_scenario_test(&1, feature, {setups_callbacks, steps_callbacks}, env))
+      options
+      |> Config.feature_path()
+      |> Loader.load_from_file()
+      |> FeaturesManager.prepare_scenarios(options)
+      |> Enum.map(&register_test(&1, {setups_callbacks, steps_callbacks}, env))
     end
   end
 
-  defp register_scenario_test(%Scenario{} = scenario, _feature, {setups, steps}, %Env{} = env) do
+  defp register_test(scenario, {setups, steps}, %Env{} = env) do
     env = %{env | line: scenario.line}
-    name = ExUnit.Case.register_test(env, :test, scenario.name, SetupsManager.normalize_tags_for_test(scenario.tags))
+    tags = SetupsManager.normalize_tags_for_test(scenario.tags)
+    name = ExUnit.Case.register_test(env, :test, scenario.name, tags)
 
     quote do
       def unquote(name)(state) do
         state = Enum.reduce(unquote(scenario.tags), state, &SetupsManager.execute(&1, &2, unquote(setups)))
+
         Enum.reduce(unquote(Macro.escape(scenario.steps)), state, &StepsManager.execute(&1, &2, unquote(steps)))
       end
     end
