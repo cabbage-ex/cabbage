@@ -291,24 +291,23 @@ defmodule Cabbage.FeatureSuggestionTest do
   end
 
   describe "provide outline missing steps" do
-    @doc """
-    TODO: Outline values aren't patternmatched to be dynamic when they are strign values
-    """
-    # test "Show missing dynamic Given step" do
-    #   message = """
-    #   Please add a matching step for:
-    #   "Given there is given a value"
-    #
-    #     defgiven ~r/^there is given a value$/, _vars, state do
-    #       # Your implementation here
-    #     end
-    #   """
-    #
-    #   assert_raise MissingStepError, message, fn ->
-    #     defmodule FeatureSuggestionTest11 do
-    #       use Cabbage.Case, feature: "outline.feature"
-    #     end
-    #   end
-    # end
+    test "Show missing dynamic Given step" do
+      message = """
+      Please add a matching step for:
+      "Given there is given a value"
+
+        defgiven ~r/^there is given <given> value$/, %{given: given}, state do
+          # Your implementation here
+        end
+      """
+
+      defmodule FeatureSuggestionTest11 do
+        use Cabbage.Case, feature: "outline.feature"
+      end
+
+      {result, output} = CabbageTestHelper.run()
+      assert result == %{failures: 6, skipped: 0, total: 6, excluded: 0}
+      assert output =~ String.replace(message, "\n", "\n     ")
+    end
   end
 end

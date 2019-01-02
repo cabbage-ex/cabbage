@@ -10,6 +10,7 @@ defmodule Cabbage.MissingStepError do
 
   defexception [:message]
 
+  @outline_regex ~r/<([a-zA-Z0-9]+)>/
   @number_regex ~r/(^|\s)\d+(\s|$)/
   @single_quote_regex ~r/'[^']+'/
   @double_quote_regex ~r/"[^"]+"/
@@ -17,15 +18,9 @@ defmodule Cabbage.MissingStepError do
   def exception(step: step) do
     extra_vars = %{table: step.table_data, doc_string: step.doc_string}
 
-    step_type =
-      case step.type do
-        :given -> "Given"
-        :when -> "When"
-        :then -> "Then"
-      end
-
     {converted_step_text, list_of_vars} =
       {step.text, []}
+      |> convert_outlined()
       |> convert_nums()
       |> convert_double_quote_strings()
       |> convert_single_quote_strings()
@@ -35,14 +30,20 @@ defmodule Cabbage.MissingStepError do
 
     message = """
     Please add a matching step for:
-    "#{step_type} #{step.text}"
+    "#{step.type |> Atom.to_string() |> String.capitalize()} #{step.text}"
 
-      def#{step_type |> String.downcase()} ~r/^#{converted_step_text}$/, #{map_of_vars}, state do
+      def#{step.type} ~r/^#{converted_step_text}$/, #{map_of_vars}, state do
         # Your implementation here
       end
     """
 
     %__MODULE__{message: message}
+  end
+
+  defp convert_outlined({step_text, vars}) do
+    outline_vars = @outline_regex |> Regex.scan(step_text, capture: :all_but_first) |> List.flatten()
+
+    {step_text, vars ++ outline_vars}
   end
 
   defp convert_nums({step_text, vars}) do
