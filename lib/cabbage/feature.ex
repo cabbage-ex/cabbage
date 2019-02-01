@@ -184,7 +184,7 @@ defmodule Cabbage.Feature do
     steps = Module.get_attribute(env.module, :steps) || []
     tags = Module.get_attribute(env.module, :tags) || []
 
-    Enum.with_index(scenarios)
+    Enum.with_index(scenarios, 1)
     |> Enum.map(fn {scenario, test_number} ->
       scenario =
         Map.put(
