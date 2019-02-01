@@ -180,6 +180,7 @@ defmodule Cabbage.Feature do
   end
 
   defmacro __before_compile__(env) do
+    background_steps = Map.get(Module.get_attribute(env.module, :feature), :background_steps) || []
     scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
     tags = Module.get_attribute(env.module, :tags) || []
@@ -217,6 +218,21 @@ defmodule Cabbage.Feature do
               end
             end
 
+            Logger.info([
+              IO.ANSI.color(61),
+              "Line ",
+              to_string(unquote(scenario.line)),
+              ":  ",
+              IO.ANSI.magenta(),
+              "Scenario: ",
+              IO.ANSI.yellow(),
+              unquote(scenario.name),
+              IO.ANSI.white()
+            ])
+
+            Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, remove_hidden_state(context))
+            unquote(Enum.map(background_steps, &compile_step(&1, steps, scenario.name)))
+
             {:ok,
              Map.merge(
                Cabbage.Feature.Helpers.fetch_state(unquote(scenario.name), __MODULE__),
@@ -236,16 +252,6 @@ defmodule Cabbage.Feature do
           def unquote(:"test #{test_number}. #{scenario.name} cabbage_test")(exunit_state) do
             Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
 
-            Logger.info([
-              IO.ANSI.color(61),
-              "Line ",
-              to_string(unquote(scenario.line)),
-              ":  ",
-              IO.ANSI.magenta(),
-              "Scenario: ",
-              IO.ANSI.yellow(),
-              unquote(scenario.name)
-            ])
 
             unquote(Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name)))
           end
@@ -297,7 +303,8 @@ defmodule Cabbage.Feature do
           unquote(step_type),
           " ",
           IO.ANSI.green(),
-          unquote(step.text)
+          unquote(step.text),
+          IO.ANSI.white()
         ])
       else
         {type, state} ->
