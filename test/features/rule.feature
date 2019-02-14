@@ -1,5 +1,5 @@
 Feature: Rule feature works
-  Tests that miultiple Rules work with backgrounds of all kinds.
+  Tests that multiple Rules work with backgrounds of all kinds.
 
   Background:
     Given I provide Background
