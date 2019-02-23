@@ -52,6 +52,8 @@ defmodule MyApp.Features.CoffeeTest do
 
   # `setup_all/1` provides a callback for doing something before the entire suite runs
   # As below, `setup/1` provides means of doing something prior to each scenario
+  # Note that ExUnit preserves the order of `setup/1` callbacks. That means if you use a Background section,
+  # the steps for the Background section will execute before the `setup/1` callback has a chance to execute.
   setup do
     on_exit fn -> # Do something when the scenario is done
       IO.puts "Scenario completed, cleanup stuff"
@@ -158,6 +160,7 @@ $ docker-compose run --rm cabbage test test/feature_test.exs
 - [x] Data tables
 - [x] Executing specific tests
 - [x] Tags implementation
-- [ ] Background steps
+- [x] Background steps
+- [x] Rules
 - [ ] Integration Helpers for Wallaby (separate project?)
 - [ ] Integration Helpers for Hound (separate project?)
