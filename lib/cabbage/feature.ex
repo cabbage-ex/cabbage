@@ -125,7 +125,6 @@ defmodule Cabbage.Feature do
   import Cabbage.Feature.Helpers
 
   alias Cabbage.Feature.{Loader, MissingStepError}
-  alias Cabbage.DescribeBlock
 
   @feature_options [:file, :template]
   defmacro __using__(options) do
@@ -181,21 +180,21 @@ defmodule Cabbage.Feature do
   end
 
   defmacro __before_compile__(env) do
+    scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
     tags = Module.get_attribute(env.module, :tags) || []
-    describe_blocks = build_describe_blocks(Module.get_attribute(env.module, :feature))
 
-    Enum.with_index(describe_blocks, 1)
-    |> Enum.map(fn {describe_block, test_number} ->
+    Enum.with_index(scenarios)
+    |> Enum.map(fn {scenario, test_number} ->
       scenario =
         Map.put(
-          describe_block.scenario,
+          scenario,
           :tags,
-          Cabbage.global_tags() ++ List.wrap(Module.get_attribute(env.module, :moduletag)) ++ describe_block.scenario.tags
+          Cabbage.global_tags() ++ List.wrap(Module.get_attribute(env.module, :moduletag)) ++ scenario.tags
         )
 
       quote do
-        describe "#{unquote(test_number)}) #{unquote(describe_block.description)}" do
+        describe "#{unquote(test_number)}. #{unquote(scenario.name)}" do
           @scenario unquote(Macro.escape(scenario))
           setup context do
             for tag <- unquote(scenario.tags) do
@@ -205,7 +204,7 @@ defmodule Cabbage.Feature do
                     unquote(Macro.escape(tags)),
                     tag,
                     unquote(env.module),
-                    unquote(describe_block.description)
+                    unquote(scenario.name)
                   )
 
                 tag ->
@@ -213,29 +212,14 @@ defmodule Cabbage.Feature do
                     unquote(Macro.escape(tags)),
                     tag,
                     unquote(env.module),
-                    unquote(describe_block.description)
+                    unquote(scenario.name)
                   )
               end
             end
 
-            Logger.info([
-              IO.ANSI.color(61),
-              "Line ",
-              to_string(unquote(scenario.line)),
-              ":  ",
-              IO.ANSI.magenta(),
-              "Scenario: ",
-              IO.ANSI.yellow(),
-              unquote(describe_block.description),
-              IO.ANSI.white()
-            ])
-
-            Cabbage.Feature.Helpers.start_state(unquote(describe_block.description), __MODULE__, remove_hidden_state(context))
-            unquote(Enum.map(describe_block.background_steps, &compile_step(&1, steps, describe_block.description)))
-
             {:ok,
              Map.merge(
-               Cabbage.Feature.Helpers.fetch_state(unquote(describe_block.description), __MODULE__),
+               Cabbage.Feature.Helpers.fetch_state(unquote(scenario.name), __MODULE__),
                context || %{}
              )}
           end
@@ -249,40 +233,36 @@ defmodule Cabbage.Feature do
             tags
           )
 
-          def unquote(:"test #{test_number}) #{describe_block.description} cabbage_test")(exunit_state) do
-            Cabbage.Feature.Helpers.start_state(unquote(describe_block.description), __MODULE__, exunit_state)
+          def unquote(:"test #{test_number}. #{scenario.name} cabbage_test")(exunit_state) do
+            Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
 
+            Logger.info([
+              IO.ANSI.color(61),
+              "Line ",
+              to_string(unquote(scenario.line)),
+              ":  ",
+              IO.ANSI.magenta(),
+              "Scenario: ",
+              IO.ANSI.yellow(),
+              unquote(scenario.name)
+            ])
 
-            unquote(Enum.map(scenario.steps, &compile_step(&1, steps, describe_block.description)))
+            unquote(Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name)))
           end
         end
       end
     end)
   end
 
-  defp build_describe_blocks(feature) do
-    cond do
-      feature.scenarios != [] ->
-        Enum.map(feature.scenarios, fn scenario ->
-          %DescribeBlock{background_steps: feature.background_steps, description: scenario.name, scenario: scenario}
-        end)
-      feature.rules != [] ->
-        Enum.flat_map(feature.rules, fn rule ->
-          Enum.map(rule.scenarios, fn scenario ->
-            %DescribeBlock{
-              background_steps: feature.background_steps ++ rule.background_steps,
-              scenario: scenario,
-              description: "#{rule.name}: #{scenario.name}"
-            }
-          end)
-        end)
-    end
-  end
+  def compile_step(step, steps, scenario_name) when is_list(steps) do
+    step_type =
+      step.__struct__
+      |> Module.split()
+      |> List.last()
 
-  defp compile_step(step, steps, scenario_name) when is_list(steps) do
     step
     |> find_implementation_of_step(steps)
-    |> compile(step, step.keyword, scenario_name)
+    |> compile(step, step_type, scenario_name)
   end
 
   defp compile(
@@ -317,8 +297,7 @@ defmodule Cabbage.Feature do
           unquote(step_type),
           " ",
           IO.ANSI.green(),
-          unquote(step.text),
-          IO.ANSI.white()
+          unquote(step.text)
         ])
       else
         {type, state} ->
