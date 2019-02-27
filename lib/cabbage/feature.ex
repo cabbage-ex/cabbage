@@ -184,8 +184,8 @@ defmodule Cabbage.Feature do
     steps = Module.get_attribute(env.module, :steps) || []
     tags = Module.get_attribute(env.module, :tags) || []
 
-    Enum.with_index(scenarios)
-    |> Enum.map(fn {scenario, test_number} ->
+    scenarios
+    |> Enum.map(fn scenario ->
       scenario =
         Map.put(
           scenario,
@@ -193,9 +193,12 @@ defmodule Cabbage.Feature do
           Cabbage.global_tags() ++ List.wrap(Module.get_attribute(env.module, :moduletag)) ++ scenario.tags
         )
 
-      quote do
-        describe "#{unquote(test_number)}. #{unquote(scenario.name)}" do
-          @scenario unquote(Macro.escape(scenario))
+      quote bind_quoted: [
+        scenario: Macro.escape(scenario),
+        tags: Macro.escape(tags),
+        steps: Macro.escape(steps)
+      ], line: scenario.line do
+        describe scenario.name do
           setup context do
             for tag <- unquote(scenario.tags) do
               case tag do
@@ -203,7 +206,7 @@ defmodule Cabbage.Feature do
                   Cabbage.Feature.Helpers.run_tag(
                     unquote(Macro.escape(tags)),
                     tag,
-                    unquote(env.module),
+                    __MODULE__,
                     unquote(scenario.name)
                   )
 
@@ -211,7 +214,7 @@ defmodule Cabbage.Feature do
                   Cabbage.Feature.Helpers.run_tag(
                     unquote(Macro.escape(tags)),
                     tag,
-                    unquote(env.module),
+                    __MODULE__,
                     unquote(scenario.name)
                   )
               end
@@ -224,28 +227,18 @@ defmodule Cabbage.Feature do
              )}
           end
 
-          tags = unquote(Macro.escape(map_tags(scenario.tags))) || []
+          tags = Cabbage.Feature.Helpers.map_tags(scenario.tags) || []
 
-          ExUnit.Case.register_test(
-            unquote(Macro.escape(%{env | line: scenario.line})),
-            :test,
-            :cabbage_test,
-            tags
-          )
+          name =
+            ExUnit.Case.register_test(
+              __ENV__,
+              :feature,
+              scenario.name,
+              tags
+            )
 
-          def unquote(:"test #{test_number}. #{scenario.name} cabbage_test")(exunit_state) do
+          def unquote(name)(exunit_state) do
             Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
-
-            Logger.info([
-              IO.ANSI.color(61),
-              "Line ",
-              to_string(unquote(scenario.line)),
-              ":  ",
-              IO.ANSI.magenta(),
-              "Scenario: ",
-              IO.ANSI.yellow(),
-              unquote(scenario.name)
-            ])
 
             unquote(Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name)))
           end
