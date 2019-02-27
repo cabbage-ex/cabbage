@@ -15,7 +15,7 @@ defmodule Cabbage.FeatureTimeoutTest do
 
       {result, output} = CabbageTestHelper.run(timeout: 10)
       assert result == %{failures: 1, skipped: 0, total: 1, excluded: 0}
-      assert output =~ "** (ExUnit.TimeoutError) test timed out after 10ms"
+      assert output =~ "** (ExUnit.TimeoutError) feature timed out after 10ms"
       assert output =~ ~r"\(elixir\) lib/process\.ex:\d+: Process\.sleep/1"
     end
 
