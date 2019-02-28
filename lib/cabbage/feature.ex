@@ -232,7 +232,7 @@ defmodule Cabbage.Feature do
           name =
             ExUnit.Case.register_test(
               __ENV__,
-              :feature,
+              :scenario,
               scenario.name,
               tags
             )
