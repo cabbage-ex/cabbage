@@ -1,14 +1,14 @@
 version: 2
 
-jobs: 
+jobs:
   test-1.8.1: &test
     parallelism: 1
     docker:
       - image: elixir:1.8.1
-            
+
     steps:
       - checkout
-      
+
       - restore_cache:
         key: testing-{{ .Environment.CIRCLE_JOB }}
 
@@ -24,28 +24,28 @@ jobs:
       - run: mix test
   test-1.7.4:
     <<: *test
-    docker: 
+    docker:
       - image: elixir:1.7.4
   test-1.6.6:
     <<: *test
-    docker: 
+    docker:
       - image: elixir:1.6.6
   test-1.5.3:
     <<: *test
-    docker: 
+    docker:
       - image: elixir:1.5.3
   test-1.4.5:
     <<: *test
-    docker: 
+    docker:
       - image: elixir:1.4.5
   test-1.3.4:
     <<: *test
-    docker: 
+    docker:
       - image: elixir:1.3.4
 
-workflows: 
+workflows:
   version: 2
-    testing_all_versions: 
+    testing_all_versions:
       jobs:
         - test-1.8.1
         - test-1.7.4
