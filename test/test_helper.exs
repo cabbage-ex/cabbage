@@ -29,9 +29,10 @@ defmodule CabbageTestHelper do
 
   defp versioned_callbacks() do
     System.version()
-    |> Version.compare("1.7.0")
+    |> Version.compare("1.6.6")
     |> case do
       :lt -> {&ExUnit.Server.add_sync_case/1, &ExUnit.Server.cases_loaded/0, &fix_13_elixir_test_result/1}
+      :eq -> {&ExUnit.Server.add_async_module/1, &ExUnit.Server.modules_loaded/0, &fix_13_elixir_test_result/1}
       _ -> {&ExUnit.Server.add_sync_module/1, &ExUnit.Server.modules_loaded/0, &fix_17_elixir_test_result/1}
     end
   end
