@@ -20,6 +20,10 @@ jobs:
 
       - save_cache:
           key: testing-{{ .Environment.CIRCLE_JOB }}
+          paths:
+            - _build
+            - deps
+            - ~/.mix
 
       - run: mix test
   test-1.7.4:
