@@ -1,7 +1,8 @@
+Code.require_file("test_helper.exs", __DIR__)
+
 defmodule Cabbage.CucumberExpressionsTest do
   use Cabbage.Feature, file: "cucumber_expressions.feature"
   alias Gherkin.Elements.Scenario
-  doctest Cabbage.Feature
 
   test "has a @feature" do
     assert "Support cucumber expressions" = @feature.name
@@ -16,15 +17,15 @@ defmodule Cabbage.CucumberExpressionsTest do
     {:ok, captures}
   end
 
-  defand "{quantity:float} float", captures, _ do
+  defgiven "{quantity:float} float", captures, _ do
     {:ok, captures}
   end
 
-  defand "{word_count:word} word", captures, _ do
+  defgiven "{word_count:word} word", captures, _ do
     {:ok, captures}
   end
 
-  defand "{matched_str:string} string", captures, _ do
+  defgiven "{matched_str:string} string", captures, _ do
     {:ok, captures}
   end
 

@@ -1,4 +1,4 @@
-defmodule MissingStepError do
+defmodule Cabbage.Feature.MissingStepError do
   @moduledoc """
   Raises an error, because a feature step is missing its implementation.
 
@@ -12,12 +12,13 @@ defmodule MissingStepError do
   @single_quote_regex ~r/'[^']+'/
   @double_quote_regex ~r/"[^"]+"/
 
-  def exception(step_text: step_text, step_type: step_type) do
+  def exception(step_text: step_text, step_type: step_type, extra_vars: extra_vars) do
     {converted_step_text, list_of_vars} =
       {step_text, []}
       |> convert_nums()
       |> convert_double_quote_strings()
       |> convert_single_quote_strings()
+      |> convert_extra_vars(extra_vars)
 
     map_of_vars = vars_to_correct_format(list_of_vars)
 
@@ -25,7 +26,7 @@ defmodule MissingStepError do
     Please add a matching step for:
     "#{step_type} #{step_text}"
 
-      def#{step_type |> String.downcase} ~r/^#{converted_step_text}$/, #{map_of_vars}, state do
+      def#{step_type |> String.downcase()} ~r/^#{converted_step_text}$/, #{map_of_vars}, state do
         # Your implementation here
       end
     """
@@ -51,6 +52,13 @@ defmodule MissingStepError do
     |> join_regex_split(1, :single_quote_string, {"", vars})
   end
 
+  defp convert_extra_vars({step_text, vars}, %{doc_string: doc_string, table: table}) do
+    vars = if doc_string == "", do: vars, else: vars ++ ["doc_string"]
+    vars = if table == [], do: vars, else: vars ++ ["table"]
+
+    {step_text, vars}
+  end
+
   defp join_regex_split([], _count, _type, {acc, vars}) do
     {String.trim(acc), vars}
   end
@@ -66,7 +74,7 @@ defmodule MissingStepError do
     join_regex_split(tail, count + 1, type, {step_text, vars})
   end
 
-  defp get_regex_capture_string(:number, count),              do: ~s/ (?<number_#{count}>\\d+) /
+  defp get_regex_capture_string(:number, count), do: ~s/ (?<number_#{count}>\d+) /
   defp get_regex_capture_string(:single_quote_string, count), do: ~s/'(?<string_#{count}>[^']+)'/
   defp get_regex_capture_string(:double_quote_string, count), do: ~s/"(?<string_#{count}>[^"]+)"/
 
@@ -75,10 +83,11 @@ defmodule MissingStepError do
   defp get_var_string(:double_quote_string, count), do: "string_#{count}"
 
   defp vars_to_correct_format([]), do: "_vars"
+
   defp vars_to_correct_format(vars) do
     joined_vars =
       vars
-      |> Enum.map(fn(var) -> "#{var}: #{var}" end)
+      |> Enum.map(fn var -> "#{var}: #{var}" end)
       |> Enum.join(", ")
 
     "%{#{joined_vars}}"

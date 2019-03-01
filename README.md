@@ -59,14 +59,14 @@ defmodule MyApp.Features.CoffeeTest do
     %{my_starting: :state, user: %User{}} # Return some beginning state
   end
 
-  # All `defgiven/4`, `defand/4`, `defwhen/4` and `defthen/4` takes a regex, matched data, state and lastly a block
+  # All `defgiven/4`, `defwhen/4` and `defthen/4` takes a regex, matched data, state and lastly a block
   defgiven ~r/^there (is|are) (?<number>\d+) coffee(s) left in the machine$/, %{number: number}, %{user: user} do
     # `{:ok, state}` gets returned from each callback which updates the state or
     # leaves the state unchanged when something else is returned
     {:ok, %{machine: Machine.put_coffee(Machine.new, number)}}
   end
 
-  defand ~r/^I have deposited £(?<number>\d+)$/, %{number: number}, %{user: user, machine: machine} do
+  defgiven ~r/^I have deposited £(?<number>\d+)$/, %{number: number}, %{user: user, machine: machine} do
     {:ok, %{machine: Machine.deposit(machine, user, number)}} # State is automatically merged so this won't erase `user`
   end
 
@@ -77,7 +77,7 @@ defmodule MyApp.Features.CoffeeTest do
 
   # Since state is unchanged, its not necessary to return it
   defthen ~r/^I should be served a coffee$/, _, state do
-    assert %Coffee{} = Machine.take_drink(state.machine) # Make your `assert`ions in `defthen/4`s and `defand/4`s
+    assert %Coffee{} = Machine.take_drink(state.machine) # Make your `assert`ions in `defthen/4`s
   end
 end
 ```
