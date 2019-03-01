@@ -13,6 +13,7 @@ defmodule Cabbage.Feature.Helpers do
     regex_string = Cabbage.Feature.CucumberExpression.to_regex_string(term)
     Code.string_to_quoted!("~r/#{regex_string}/")
   end
+
   defp to_regex_ast(term), do: term
 
   def add_tag(module, "@" <> tag_name, block), do: add_tag(module, tag_name, block)

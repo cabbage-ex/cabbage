@@ -10,7 +10,7 @@ defmodule Cabbage.Feature.Parameter do
 
   @type t :: %__MODULE__{}
 
-  @spec convert(String.t()) :: t() | String.t
+  @spec convert(String.t()) :: t() | String.t()
   def convert(term) do
     parameter_format = ~r/\{(?<name>.*):(?<type>.*)\}/u
 

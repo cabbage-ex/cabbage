@@ -194,10 +194,11 @@ defmodule Cabbage.Feature do
         )
 
       quote bind_quoted: [
-        scenario: Macro.escape(scenario),
-        tags: Macro.escape(tags),
-        steps: Macro.escape(steps)
-      ], line: scenario.line do
+              scenario: Macro.escape(scenario),
+              tags: Macro.escape(tags),
+              steps: Macro.escape(steps)
+            ],
+            line: scenario.line do
         describe scenario.name do
           setup context do
             for tag <- unquote(scenario.tags) do
