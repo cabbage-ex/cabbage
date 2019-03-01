@@ -14,9 +14,7 @@ jobs:
 
       - run: mix local.hex --force
       - run: mix local.rebar --force
-      - run: mix deps.get --only test
-      - run: mix deps.compile
-      - run: mix compile
+      - run: MIX_ENV=test mix do deps.get --only test, deps.compile, compile
 
       - save_cache:
           key: testing-{{ .Environment.CIRCLE_JOB }}
