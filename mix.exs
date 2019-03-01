@@ -19,7 +19,8 @@ defmodule Cabbage.Mixfile do
       ],
       package: package(),
       deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
@@ -47,7 +48,8 @@ defmodule Cabbage.Mixfile do
     [
       {:gherkin, "~> 1.6"},
       {:ex_doc, "~> 0.19", only: :dev},
-      {:earmark, "~> 1.2", only: :dev}
+      {:earmark, "~> 1.2", only: :dev},
+      {:excoveralls, "~> 0.10", only: :test}
     ]
   end
 
