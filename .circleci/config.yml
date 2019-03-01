@@ -68,7 +68,7 @@ workflows:
           version: 1.8.1
           execute:
             - run:
-                command: mix coveralls.circle
+                command: MIX_ENV=test mix coveralls.circle
                 environment:
                   COVERALLS_REPO_TOKEN: 5wI8JIzygEDIF4A03KNIKWdOmVK2A8dMC
       - build:
