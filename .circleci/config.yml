@@ -39,32 +39,39 @@ workflows:
   testing_all_versions:
     jobs:
       - build:
-         version: 1.8.1
-         execute:
-           - run: mix test
+          name: "Test in elixir 1.8.1"
+          version: 1.8.1
+          execute:
+            - run: mix test
       - build:
-         version: 1.7.4
-         execute:
-           - run: mix test
+          name: "Test in elixir 1.7.4"
+          version: 1.7.4
+          execute:
+            - run: mix test
       - build:
-         version: 1.6.6
-         execute:
-           - run: mix test
+          name: "Test in elixir 1.6.6"
+          version: 1.6.6
+          execute:
+            - run: mix test
       - build:
-         version: 1.5.3
-         execute:
-           - run: mix test
+          name: "Test in elixir 1.5.3"
+          version: 1.5.3
+          execute:
+            - run: mix test
       - build:
-         version: 1.4.5
-         execute:
-           - run: mix test
+          name: "Test in elixir 1.4.5"
+          version: 1.4.5
+          execute:
+            - run: mix test
       - build:
-         version: 1.3.4
-         execute:
-           - run: mix test
+          name: "Test in elixir 1.3.4"
+          version: 1.3.4
+          execute:
+            - run: mix test
   validate_code_quality:
     jobs:
       - build:
+          name: "Tests coverge"
           version: 1.8.1
           execute:
             - run:
@@ -72,6 +79,7 @@ workflows:
                 environment:
                   COVERALLS_REPO_TOKEN: 5wI8JIzygEDIF4A03KNIKWdOmVK2A8dMC
       - build:
+          name: "Code quality"
           version: 1.8.1
           execute:
             - run: mix format --check-formatted
