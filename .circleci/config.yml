@@ -1,15 +1,20 @@
 version: 2.1
 
+default_version: &default_version 1.8.1
+default_steps: &default_steps
+  - run: mix test
+
 jobs:
   build:
     parameters:
       version:
         description: Elixir version
         type: string
+        default: *default_version
       execute:
         description: What steps to execute after build
         type: steps
-        default: []
+        default: *default_steps
 
     parallelism: 1
     docker:
@@ -41,38 +46,25 @@ workflows:
       - build:
           name: "Test in elixir 1.8.1"
           version: 1.8.1
-          execute:
-            - run: mix test
       - build:
           name: "Test in elixir 1.7.4"
           version: 1.7.4
-          execute:
-            - run: mix test
       - build:
           name: "Test in elixir 1.6.6"
           version: 1.6.6
-          execute:
-            - run: mix test
       - build:
           name: "Test in elixir 1.5.3"
           version: 1.5.3
-          execute:
-            - run: mix test
       - build:
           name: "Test in elixir 1.4.5"
           version: 1.4.5
-          execute:
-            - run: mix test
       - build:
           name: "Test in elixir 1.3.4"
           version: 1.3.4
-          execute:
-            - run: mix test
   validate_code_quality:
     jobs:
       - build:
           name: "Tests coverge"
-          version: 1.8.1
           execute:
             - run:
                 command: MIX_ENV=test mix coveralls.circle
@@ -80,6 +72,5 @@ workflows:
                   COVERALLS_REPO_TOKEN: 5wI8JIzygEDIF4A03KNIKWdOmVK2A8dMC
       - build:
           name: "Code quality"
-          version: 1.8.1
           execute:
             - run: mix format --check-formatted
