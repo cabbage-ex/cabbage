@@ -180,6 +180,7 @@ defmodule Cabbage.Feature do
   end
 
   defmacro __before_compile__(env) do
+    background_steps = Map.get(Module.get_attribute(env.module, :feature), :background_steps) || []
     scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
     tags = Module.get_attribute(env.module, :tags) || []
@@ -194,6 +195,7 @@ defmodule Cabbage.Feature do
         )
 
       quote bind_quoted: [
+              background_steps: Macro.escape(background_steps),
               scenario: Macro.escape(scenario),
               tags: Macro.escape(tags),
               steps: Macro.escape(steps)
@@ -241,7 +243,7 @@ defmodule Cabbage.Feature do
           def unquote(name)(exunit_state) do
             Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
 
-            unquote(Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name)))
+            unquote(Enum.map(background_steps ++ scenario.steps, &compile_step(&1, steps, scenario.name)))
           end
         end
       end
