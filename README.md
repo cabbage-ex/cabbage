@@ -5,8 +5,7 @@
 [![Build Status](https://semaphoreci.com/api/v1/cabbage-ex/cabbage/branches/master/shields_badge.svg)](https://semaphoreci.com/cabbage-ex/cabbage)
 [![Hex.pm](https://img.shields.io/hexpm/v/cabbage.svg)]()
 
-<img src="https://www.organicfacts.net/wp-content/uploads/2013/12/redcabbage.jpg" width="240px" height="180px"></img>
-##### (Looking contribution for a better icon!)
+<img src="https://cdn.pixabay.com/photo/2016/04/01/09/05/cabbage-1299145_960_720.png" width="240px" height="180px"></img>
 
 A simple addon on top of [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) which provides compile time translation of `.feature` files to exunit tests. Big thanks to [@meadsteve](https://github.com/meadsteve) and the [White Bread](https://github.com/meadsteve/white-bread) project for a huge head start on this project.
 
