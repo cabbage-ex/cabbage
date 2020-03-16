@@ -309,9 +309,13 @@ defmodule Cabbage.Feature do
   end
 
   defp compile(_, step, step_type, _scenario_name) do
-    extra_vars = %{table: step.table_data, doc_string: step.doc_string}
+    step_text = step.text
+    table = Macro.escape(step.table_data)
+    doc_string = step.doc_string
 
-    raise MissingStepError, step_text: step.text, step_type: step_type, extra_vars: extra_vars
+    quote generated: true do
+      raise MissingStepError, [step_text: unquote(step_text), step_type: unquote(step_type), extra_vars: %{table: unquote(table), doc_string: unquote(doc_string)}]
+    end
   end
 
   defp find_implementation_of_step(step, steps) do
