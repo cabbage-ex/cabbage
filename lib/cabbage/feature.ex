@@ -285,7 +285,7 @@ defmodule Cabbage.Feature do
           new_state
         end)
 
-        Logger.info([
+        Logger.warn([
           "\t\t",
           IO.ANSI.cyan(),
           unquote(step_type),
