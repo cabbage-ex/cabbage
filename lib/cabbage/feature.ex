@@ -275,6 +275,14 @@ defmodule Cabbage.Feature do
       with {_type, unquote(vars)} <- {:variables, unquote(Macro.escape(named_vars))},
            {_type, state = unquote(state_pattern)} <-
              {:state, Cabbage.Feature.Helpers.fetch_state(unquote(scenario_name), __MODULE__)} do
+        Logger.warn([
+          "\t\t",
+          IO.ANSI.cyan(),
+          unquote(step_type),
+          " ",
+          IO.ANSI.green(),
+          unquote(step.text)
+        ])
         new_state =
           case unquote(block) do
             {:ok, new_state} -> Map.merge(state, new_state)
@@ -285,14 +293,6 @@ defmodule Cabbage.Feature do
           new_state
         end)
 
-        Logger.warn([
-          "\t\t",
-          IO.ANSI.cyan(),
-          unquote(step_type),
-          " ",
-          IO.ANSI.green(),
-          unquote(step.text)
-        ])
       else
         {type, state} ->
           metadata = unquote(Macro.escape(metadata))
