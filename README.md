@@ -160,6 +160,7 @@ $ docker-compose run --rm cabbage test test/feature_test.exs
 - [x] Data tables
 - [x] Executing specific tests
 - [x] Tags implementation
-- [ ] Background steps
+- [x] Background steps
+- [x] Rules
 - [ ] Integration Helpers for Wallaby (separate project?)
 - [ ] Integration Helpers for Hound (separate project?)

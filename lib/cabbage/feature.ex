@@ -125,6 +125,7 @@ defmodule Cabbage.Feature do
   import Cabbage.Feature.Helpers
 
   alias Cabbage.Feature.{Loader, MissingStepError}
+  alias Cabbage.DescribeBlock
 
   @feature_options [:file, :template]
   defmacro __using__(options) do
@@ -180,26 +181,27 @@ defmodule Cabbage.Feature do
   end
 
   defmacro __before_compile__(env) do
-    scenarios = Module.get_attribute(env.module, :scenarios) || []
     steps = Module.get_attribute(env.module, :steps) || []
     tags = Module.get_attribute(env.module, :tags) || []
+    describe_blocks = build_describe_blocks(Module.get_attribute(env.module, :feature))
 
-    scenarios
-    |> Enum.map(fn scenario ->
+    describe_blocks
+    |> Enum.map(fn describe_block ->
       scenario =
         Map.put(
-          scenario,
+          describe_block.scenario,
           :tags,
-          Cabbage.global_tags() ++ List.wrap(Module.get_attribute(env.module, :moduletag)) ++ scenario.tags
+          Cabbage.global_tags() ++ List.wrap(Module.get_attribute(env.module, :moduletag)) ++ describe_block.scenario.tags
         )
 
       quote bind_quoted: [
+              describe_block: Macro.escape(describe_block),
               scenario: Macro.escape(scenario),
               tags: Macro.escape(tags),
               steps: Macro.escape(steps)
             ],
             line: scenario.line do
-        describe scenario.name do
+        describe describe_block.description do
           setup context do
             for tag <- unquote(scenario.tags) do
               case tag do
@@ -208,7 +210,7 @@ defmodule Cabbage.Feature do
                     unquote(Macro.escape(tags)),
                     tag,
                     __MODULE__,
-                    unquote(scenario.name)
+                    unquote(describe_block.description)
                   )
 
                 tag ->
@@ -216,14 +218,14 @@ defmodule Cabbage.Feature do
                     unquote(Macro.escape(tags)),
                     tag,
                     __MODULE__,
-                    unquote(scenario.name)
+                    unquote(describe_block.description)
                   )
               end
             end
 
             {:ok,
              Map.merge(
-               Cabbage.Feature.Helpers.fetch_state(unquote(scenario.name), __MODULE__),
+               Cabbage.Feature.Helpers.fetch_state(unquote(describe_block.description), __MODULE__),
                context || %{}
              )}
           end
@@ -234,14 +236,14 @@ defmodule Cabbage.Feature do
             ExUnit.Case.register_test(
               __ENV__,
               :scenario,
-              scenario.name,
+              describe_block.description,
               tags
             )
 
           def unquote(name)(exunit_state) do
-            Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
+            Cabbage.Feature.Helpers.start_state(unquote(describe_block.description), __MODULE__, exunit_state)
 
-            unquote(Enum.map(scenario.steps, &compile_step(&1, steps, scenario.name)))
+            unquote(Enum.map(describe_block.background_steps ++ scenario.steps, &compile_step(&1, steps, describe_block.description)))
           end
         end
       end
@@ -249,14 +251,9 @@ defmodule Cabbage.Feature do
   end
 
   def compile_step(step, steps, scenario_name) when is_list(steps) do
-    step_type =
-      step.__struct__
-      |> Module.split()
-      |> List.last()
-
     step
     |> find_implementation_of_step(steps)
-    |> compile(step, step_type, scenario_name)
+    |> compile(step, step.keyword, scenario_name)
   end
 
   defp compile(
@@ -312,6 +309,25 @@ defmodule Cabbage.Feature do
     extra_vars = %{table: step.table_data, doc_string: step.doc_string}
 
     raise MissingStepError, step_text: step.text, step_type: step_type, extra_vars: extra_vars
+  end
+
+  defp build_describe_blocks(feature) do
+    cond do
+      feature.rules != [] ->
+        Enum.flat_map(feature.rules, fn rule ->
+          Enum.map(rule.scenarios, fn scenario ->
+            %DescribeBlock{
+              background_steps: feature.background_steps ++ rule.background_steps,
+              scenario: scenario,
+              description: "#{rule.name}: #{scenario.name}"
+            }
+          end)
+        end)
+      feature.scenarios != [] ->
+        Enum.map(feature.scenarios, fn scenario ->
+          %DescribeBlock{background_steps: feature.background_steps, description: scenario.name, scenario: scenario}
+        end)
+    end
   end
 
   defp find_implementation_of_step(step, steps) do
