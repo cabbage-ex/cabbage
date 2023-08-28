@@ -1,6 +1,6 @@
 version: 2.1
 
-default_version: &default_version 1.8.1
+default_version: &default_version 1.14.0
 default_steps: &default_steps
   - run: mix test
 
@@ -44,23 +44,14 @@ workflows:
   testing_all_versions:
     jobs:
       - build:
-          name: "Test in elixir 1.8.1"
-          version: 1.8.1
+          name: "Test in elixir 1.13.0"
+          version: 1.13.0
       - build:
-          name: "Test in elixir 1.7.4"
-          version: 1.7.4
+          name: "Test in elixir 1.14.0"
+          version: 1.14.0
       - build:
-          name: "Test in elixir 1.6.6"
-          version: 1.6.6
-      - build:
-          name: "Test in elixir 1.5.3"
-          version: 1.5.3
-      - build:
-          name: "Test in elixir 1.4.5"
-          version: 1.4.5
-      - build:
-          name: "Test in elixir 1.3.4"
-          version: 1.3.4
+          name: "Test in elixir 1.15.0"
+          version: 1.15.0
   validate_code_quality:
     jobs:
       - build:
