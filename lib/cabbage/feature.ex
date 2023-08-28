@@ -295,9 +295,7 @@ defmodule Cabbage.Feature do
           metadata = unquote(Macro.escape(metadata))
 
           reraise """
-                  ** (MatchError) Failure to match #{type} of #{
-                    inspect(Cabbage.Feature.Helpers.remove_hidden_state(state))
-                  }
+                  ** (MatchError) Failure to match #{type} of #{inspect(Cabbage.Feature.Helpers.remove_hidden_state(state))}
                   Pattern: #{unquote(Macro.to_string(state_pattern))}
                   """,
                   Cabbage.Feature.Helpers.stacktrace(__MODULE__, metadata)
