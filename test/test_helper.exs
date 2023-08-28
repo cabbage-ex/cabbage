@@ -10,12 +10,12 @@ Code.prepend_path(path)
 defmodule CabbageTestHelper do
   import ExUnit.CaptureIO
 
-  def run(filters \\ [], cases \\ [])
+  def run(filters \\ [], modules \\ [])
 
-  def run(filters, module) do
+  def run(filters, modules) do
     {add_module, load_module, result_fix} = versioned_callbacks()
 
-    Enum.each(module, add_module)
+    Enum.each(modules, add_module)
     load_module.()
 
     opts =
@@ -33,7 +33,7 @@ defmodule CabbageTestHelper do
     |> case do
       :lt -> {&ExUnit.Server.add_sync_case/1, &ExUnit.Server.cases_loaded/0, &fix_13_elixir_test_result/1}
       :eq -> {&ExUnit.Server.add_async_module/1, &ExUnit.Server.modules_loaded/0, &fix_13_elixir_test_result/1}
-      _ -> {&ExUnit.Server.add_sync_module/1, &ExUnit.Server.modules_loaded/0, &fix_17_elixir_test_result/1}
+      _ -> {&ExUnit.Server.add_sync_module/1, fn -> ExUnit.Server.modules_loaded(true) end, &fix_17_elixir_test_result/1}
     end
   end
 
