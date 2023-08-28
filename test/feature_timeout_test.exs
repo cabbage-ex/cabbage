@@ -16,7 +16,7 @@ defmodule Cabbage.FeatureTimeoutTest do
       {result, output} = CabbageTestHelper.run(timeout: 10)
       assert result == %{failures: 1, skipped: 0, total: 1, excluded: 0}
       assert output =~ ~r"\*\* \(ExUnit.TimeoutError\) \w+ timed out after \d+ms"
-      assert output =~ ~r"\(elixir\) lib/process\.ex:\d+: Process\.sleep/1"
+      assert output =~ ~r"\(elixir(\s+\d+\.\d+\.\d+)?\) lib/process\.ex:\d+: Process\.sleep/1"
     end
 
     test "scenario with custom timeout can execute longer than default limit" do
