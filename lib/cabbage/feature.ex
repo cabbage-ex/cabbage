@@ -249,10 +249,7 @@ defmodule Cabbage.Feature do
   end
 
   def compile_step(step, steps, scenario_name) when is_list(steps) do
-    step_type =
-      step.__struct__
-      |> Module.split()
-      |> List.last()
+    step_type = step.keyword
 
     step
     |> find_implementation_of_step(steps)

@@ -1,5 +1,5 @@
 defmodule Cabbage.Feature.Loader do
-  alias Gherkin.Elements.{Feature, Scenario, Steps}
+  alias Gherkin.Elements.{Feature, Scenario, Step}
 
   def load_from_file(path) do
     "#{Cabbage.base_path()}#{path}"
@@ -24,8 +24,8 @@ defmodule Cabbage.Feature.Loader do
     %{scenario | steps: steps}
   end
 
-  defp fix_step_type(%Steps.And{} = current_step, [previous_step | _] = steps) do
-    fixed_step = %{current_step | __struct__: previous_step.__struct__}
+  defp fix_step_type(%Step{keyword: "And"} = current_step, [previous_step | _] = steps) do
+    fixed_step = %{current_step | keyword: previous_step.keyword}
     [fixed_step | steps]
   end
 
