@@ -41,7 +41,7 @@ defmodule CabbageTestHelper do
         {&ExUnit.Server.add_sync_module/1, &ExUnit.Server.modules_loaded/0, &fix_17_elixir_test_result/1}
 
       {_, _} ->
-        {&ExUnit.Server.add_sync_module/1, fn -> ExUnit.Server.modules_loaded(false) end, &fix_17_elixir_test_result/1}
+        {&ExUnit.Server.add_sync_module/1, fn -> ExUnit.Server.modules_loaded(true) end, &fix_17_elixir_test_result/1}
     end
   end
 
