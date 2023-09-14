@@ -1,12 +1,13 @@
 defmodule Cabbage.Mixfile do
   use Mix.Project
 
-  @version "0.3.6"
+  @version "0.4.0"
+  
   def project do
     [
       app: :cabbage,
       version: @version,
-      elixir: "~> 1.3",
+      elixir: "~> 1.13",
       source_url: "git@github.com:cabbage-ex/cabbage.git",
       homepage_url: "https://github.com/cabbage-ex/cabbage",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -55,7 +56,7 @@ defmodule Cabbage.Mixfile do
 
   defp package do
     [
-      maintainers: ["Matt Widmann", "Steve B"],
+      maintainers: ["Matt Widmann", "Steve B", "Max Marcon"],
       licenses: ["MIT"],
       links: %{github: "https://github.com/cabbage-ex/cabbage"}
     ]
