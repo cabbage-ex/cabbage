@@ -2,7 +2,7 @@ defmodule Cabbage.Mixfile do
   use Mix.Project
 
   @version "0.4.0"
-  
+
   def project do
     [
       app: :cabbage,
