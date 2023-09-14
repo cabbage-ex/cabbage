@@ -17,7 +17,7 @@ A simple addon on top of [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) which 
 
 ```elixir
 def deps do
-  [{:cabbage, "~> 0.3.0"}]
+  [{:cabbage, "~> 0.4.0"}]
 end
 ```
 
