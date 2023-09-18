@@ -47,9 +47,8 @@ defmodule Cabbage.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:gherkin, "~> 1.6"},
+      {:gherkin, "~> 2.0"},
       {:ex_doc, "~> 0.19", only: :dev},
-      {:earmark, "~> 1.2", only: :dev},
       {:excoveralls, "~> 0.10", only: :test}
     ]
   end
