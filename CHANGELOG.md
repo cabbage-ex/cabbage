@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.4.1
+
+- Updated dependencies, remove dependency on retired `gherkin 1.6.1`
+
 ### v0.4.0
 
 - Support for new Elixir versions >= 1.13
