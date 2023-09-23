@@ -6,9 +6,9 @@ Feature: Can have complex features
     When I provide When with "when dynamic" part and with one more "another when dynamic" part
     Then I provide Then with number 6 part and with docs part
       """
-      Here is provided some complex part that is way to complex
+      Here is provided some complex part that is way too complex
       """
     And I provide And with "and dynamic" part and with one more "another and dynamic" part and with table part
       | Name | Age |
-      | John | 30 |
-      | Ann | 29 |
+      | John | 30  |
+      | Ann  | 29  |
