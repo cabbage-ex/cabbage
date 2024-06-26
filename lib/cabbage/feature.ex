@@ -230,13 +230,7 @@ defmodule Cabbage.Feature do
 
           tags = Cabbage.Feature.Helpers.map_tags(scenario.tags) || []
 
-          name =
-            ExUnit.Case.register_test(
-              __ENV__,
-              :scenario,
-              scenario.name,
-              tags
-            )
+          name = ExUnit.Case.register_test(__ENV__, :scenario, "test", tags)
 
           def unquote(name)(exunit_state) do
             Cabbage.Feature.Helpers.start_state(unquote(scenario.name), __MODULE__, exunit_state)
