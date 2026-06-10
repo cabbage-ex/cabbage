@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Elixir ${{ matrix.elixir }} / OTP ${{ matrix.otp }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - elixir: "1.18.1"
+            otp: "27.0.1"
+          - elixir: "1.19.5"
+            otp: "28.1"
+          - elixir: "1.20.1"
+            otp: "27.0.1"
+
+    env:
+      MIX_ENV: test
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Elixir / OTP
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+          version-type: strict
+
+      - name: Restore deps and _build cache
+        uses: actions/cache@v5
+        with:
+          path: |
+            deps
+            _build
+          # The gherkin dependency is a git ref (no hash in mix.lock changes
+          # unless the pin moves), so the key folds in mix.lock + the BEAM
+          # versions and falls back to the latest partial match.
+          key: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-
+
+      # Resolves the gherkin fork from GitHub over HTTPS (public repo).
+      - name: Fetch dependencies
+        run: mix deps.get
+
+      - name: Check formatting
+        run: mix format --check-formatted
+
+      - name: Compile (warnings as errors)
+        run: mix compile --warnings-as-errors
+
+      - name: Run tests
+        run: mix test
+
+      # The conformance.* mix tasks print scoreboards but always exit 0, so they
+      # are informational here. The hard gate is the tagged ExUnit conformance
+      # suite below, which asserts the expected passing-sample sets and fails the
+      # build on any regression.
+      - name: Conformance scoreboards (informational)
+        run: |
+          mix conformance.cck
+          mix conformance.tags
+          mix conformance.expressions
+
+      - name: Conformance gate (CCK 43/44, tags 64/64, expressions 115/115)
+        run: mix test --only conformance

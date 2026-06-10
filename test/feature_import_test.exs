@@ -65,6 +65,7 @@ defmodule Cabbage.FeatureImportTest do
 
         defthen ~r/^I provide Then$/, _vars, %{state: state} do
           assert state == 3
+          :ok
         end
       end
 
@@ -107,6 +108,7 @@ defmodule Cabbage.FeatureImportTest do
 
         defthen ~r/^I provide Then$/, _vars, state do
           assert state.module_state == "state"
+          :ok
         end
       end
 
@@ -144,6 +146,7 @@ defmodule Cabbage.FeatureImportTest do
 
         defthen ~r/^I provide Then$/, _vars, %{state: state} do
           assert state == 13
+          :ok
         end
       end
 

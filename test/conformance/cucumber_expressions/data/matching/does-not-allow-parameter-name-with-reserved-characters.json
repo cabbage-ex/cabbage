@@ -1,0 +1,1 @@
+{"expression":"{(string)}","text":"something","exception":"This Cucumber Expression has a problem at column 2:\n\n{(string)}\n ^\nParameter names may not contain '{', '}', '(', ')', '\\' or '/'.\nDid you mean to use a regular expression?"}

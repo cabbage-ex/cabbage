@@ -1,0 +1,1 @@
+{"expression":"{unknown}","text":"something","exception":"This Cucumber Expression has a problem at column 1:\n\n{unknown}\n^-------^\nUndefined parameter type 'unknown'.\nPlease register a ParameterType for 'unknown'"}

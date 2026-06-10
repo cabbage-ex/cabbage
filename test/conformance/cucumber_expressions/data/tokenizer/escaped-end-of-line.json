@@ -1,0 +1,1 @@
+{"expression":"\\","exception":"This Cucumber Expression has a problem at column 1:\n\n\\\n^\nThe end of line can not be escaped.\nYou can use '\\\\' to escape the '\\'"}

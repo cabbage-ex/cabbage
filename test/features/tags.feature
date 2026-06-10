@@ -15,7 +15,7 @@ Feature: Can have tagged features
     When I provide When
     Then I provide Then
 
-  @tag_with_value my_value
+  @valued_tag
   Scenario: Scenario with value for tag
     When I provide When
     Then I provide Then

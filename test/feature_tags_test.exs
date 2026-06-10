@@ -40,7 +40,11 @@ defmodule Cabbage.FeatureTagsTest do
       {result, _output} = CabbageTestHelper.run([exclude: [:test], include: [:another_tag]], modules)
       assert result == %{failures: 0, skipped: 0, total: 8, excluded: 6}
 
-      {result, _output} = CabbageTestHelper.run([exclude: [:test], include: [tag_with_value: "my_value"]], modules)
+      # `@valued_tag` is a plain Gherkin tag. (The old `@tag_with_value my_value`
+      # form is invalid Gherkin — a tag may not contain whitespace — and is now
+      # rejected by the conformant parser; valued ExUnit tags still come from
+      # @moduletag / config, exercised below.)
+      {result, _output} = CabbageTestHelper.run([exclude: [:test], include: [:valued_tag]], modules)
       assert result == %{failures: 0, skipped: 0, total: 8, excluded: 6}
 
       {result, _output} = CabbageTestHelper.run([exclude: [:test], include: [:ex_unit_style_tag]], modules)

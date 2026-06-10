@@ -15,6 +15,7 @@ defmodule Cabbage.FeatureSetupTest do
 
         defthen ~r/^I provide Then$/, _vars, _state do
           assert true
+          :ok
         end
       end
 
@@ -33,6 +34,7 @@ defmodule Cabbage.FeatureSetupTest do
 
         defthen ~r/^I provide Then$/, _vars, state do
           assert state.module_state == "state"
+          :ok
         end
       end
 

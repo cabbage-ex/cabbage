@@ -12,7 +12,7 @@ defmodule Cabbage.FeatureAttributesTest do
     test "simple feature contains correct attributes" do
       defmodule FeatureAttributeTest do
         use Cabbage.Feature, file: "simplest.feature"
-        alias Gherkin.Elements.Scenario
+        alias Cabbage.Feature.Scenario
 
         test "has a @feature" do
           # [:background_steps, :description, :file, :line, :name, :role, :scenarios, :tags]
@@ -33,7 +33,7 @@ defmodule Cabbage.FeatureAttributesTest do
     test "outlined feature contains correct attributes" do
       defmodule FeatureAttributeTest2 do
         use Cabbage.Feature, file: "outline.feature"
-        alias Gherkin.Elements.Scenario
+        alias Cabbage.Feature.Scenario
 
         test "has a @feature" do
           # [:background_steps, :description, :file, :line, :name, :role, :scenarios, :tags]

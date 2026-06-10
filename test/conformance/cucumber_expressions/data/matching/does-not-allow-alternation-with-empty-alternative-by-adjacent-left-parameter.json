@@ -1,0 +1,1 @@
+{"expression":"{int}/x","text":"3","exception":"This Cucumber Expression has a problem at column 6:\n\n{int}/x\n     ^\nAlternative may not be empty.\nIf you did not mean to use an alternative you can use '\\/' to escape the '/'"}

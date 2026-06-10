@@ -1,0 +1,1 @@
+{"expression":"\\[","exception":"This Cucumber Expression has a problem at column 2:\n\n\\[\n ^\nOnly the characters '{', '}', '(', ')', '\\', '/' and whitespace can be escaped.\nIf you did mean to use an '\\' you can use '\\\\' to escape it"}

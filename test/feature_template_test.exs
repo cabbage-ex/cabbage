@@ -10,7 +10,9 @@ defmodule Cabbage.FeatureTestTest do
       using do
         quote do
           setup_all do
-            {:ok, %{case_template: unquote(__MODULE__)}}
+            # :case_template is a hidden bookkeeping key stripped from step state;
+            # use a distinct key to observe that the template's setup_all ran.
+            {:ok, %{template_module: unquote(__MODULE__)}}
           end
         end
       end
@@ -20,7 +22,8 @@ defmodule Cabbage.FeatureTestTest do
       use Cabbage.Feature, file: "simplest.feature", template: CustomTemplate
 
       defthen ~r/^I provide Then$/, _vars, state do
-        assert state.case_template == CustomTemplate
+        assert state.template_module == CustomTemplate
+        :ok
       end
     end
 

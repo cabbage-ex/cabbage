@@ -1,0 +1,1 @@
+{"expression":"three (brown)/black mice","text":"three brown mice","exception":"This Cucumber Expression has a problem at column 7:\n\nthree (brown)/black mice\n      ^-----^\nAn alternative may not exclusively contain optionals.\nIf you did not mean to use an optional you can use '\\(' to escape the '('"}

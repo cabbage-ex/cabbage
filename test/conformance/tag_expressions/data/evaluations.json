@@ -1,0 +1,195 @@
+[
+  {
+    "expression": "",
+    "tests": [
+      {
+        "variables": [
+
+        ],
+        "result": true
+      },
+      {
+        "variables": [
+          "x"
+        ],
+        "result": true
+      },
+      {
+        "variables": [
+          "y"
+        ],
+        "result": true
+      }
+    ]
+  },
+  {
+    "expression": "not x",
+    "tests": [
+      {
+        "variables": [
+          "x"
+        ],
+        "result": false
+      },
+      {
+        "variables": [
+          "y"
+        ],
+        "result": true
+      }
+    ]
+  },
+  {
+    "expression": "x and y",
+    "tests": [
+      {
+        "variables": [
+          "x",
+          "y"
+        ],
+        "result": true
+      },
+      {
+        "variables": [
+          "x"
+        ],
+        "result": false
+      },
+      {
+        "variables": [
+          "y"
+        ],
+        "result": false
+      }
+    ]
+  },
+  {
+    "expression": "x or y",
+    "tests": [
+      {
+        "variables": [
+
+        ],
+        "result": false
+      },
+      {
+        "variables": [
+          "x",
+          "y"
+        ],
+        "result": true
+      },
+      {
+        "variables": [
+          "x"
+        ],
+        "result": true
+      },
+      {
+        "variables": [
+          "y"
+        ],
+        "result": true
+      }
+    ]
+  },
+  {
+    "expression": "x\\(1\\) or y\\(2\\)",
+    "tests": [
+      {
+        "variables": [
+          "x(1)"
+        ],
+        "result": true
+      },
+      {
+        "variables": [
+          "y(2)"
+        ],
+        "result": true
+      }
+    ]
+  },
+  {
+    "expression": "x\\\\ or y\\\\\\) or z\\\\",
+    "tests": [
+      {
+        "variables": [
+          "x\\"
+        ],
+        "result": true
+      },
+      {
+        "variables": [
+          "y\\)"
+        ],
+        "result": true
+      },
+      {
+        "variables": [
+          "z\\"
+        ],
+        "result": true
+      },
+      {
+        "variables": [
+          "x"
+        ],
+        "result": false
+      },
+      {
+        "variables": [
+          "y)"
+        ],
+        "result": false
+      },
+      {
+        "variables": [
+          "z"
+        ],
+        "result": false
+      }
+    ]
+  },
+  {
+    "expression": "\\\\x or y\\\\ or z\\\\",
+    "tests": [
+      {
+        "variables": [
+          "\\x"
+        ],
+        "result": true
+      },
+      {
+        "variables": [
+          "y\\"
+        ],
+        "result": true
+      },
+      {
+        "variables": [
+          "z\\"
+        ],
+        "result": true
+      },
+      {
+        "variables": [
+          "x"
+        ],
+        "result": false
+      },
+      {
+        "variables": [
+          "y"
+        ],
+        "result": false
+      },
+      {
+        "variables": [
+          "z"
+        ],
+        "result": false
+      }
+    ]
+  }
+]

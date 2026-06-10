@@ -1,0 +1,1 @@
+{"expression":"a/b c/d/e","expected_regex":"^(?:a|b) (?:c|d|e)$"}

@@ -1,0 +1,1 @@
+{"expression":"(a(b))","exception":"This Cucumber Expression has a problem at column 3:\n\n(a(b))\n  ^-^\nAn optional may not contain an other optional.\nIf you did not mean to use an optional type you can use '\\(' to escape the '('. For more complicated expressions consider using a regular expression instead."}

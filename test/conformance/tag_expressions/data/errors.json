@@ -1,0 +1,62 @@
+[
+  {
+    "expression": "@a @b or",
+    "error": "Tag expression \"@a @b or\" could not be parsed because of syntax error: Expected operator."
+  },
+  {
+    "expression": "@a and (@b not)",
+    "error": "Tag expression \"@a and (@b not)\" could not be parsed because of syntax error: Expected operator."
+  },
+  {
+    "expression": "@a and (@b @c) or",
+    "error": "Tag expression \"@a and (@b @c) or\" could not be parsed because of syntax error: Expected operator."
+  },
+  {
+    "expression": "@a and or",
+    "error": "Tag expression \"@a and or\" could not be parsed because of syntax error: Expected operand."
+  },
+  {
+    "expression": "or or",
+    "error": "Tag expression \"or or\" could not be parsed because of syntax error: Expected operand."
+  },
+  {
+    "expression": "a and or",
+    "error": "Tag expression \"a and or\" could not be parsed because of syntax error: Expected operand."
+  },
+  {
+    "expression": "a b",
+    "error": "Tag expression \"a b\" could not be parsed because of syntax error: Expected operator."
+  },
+  {
+    "expression": "( a and b ) )",
+    "error": "Tag expression \"( a and b ) )\" could not be parsed because of syntax error: Unmatched )."
+  },
+  {
+    "expression": "( ( a and b )",
+    "error": "Tag expression \"( ( a and b )\" could not be parsed because of syntax error: Unmatched (."
+  },
+  {
+    "expression": "x or \\y or z",
+    "error": "Tag expression \"x or \\y or z\" could not be parsed because of syntax error: Illegal escape before \"y\"."
+  },
+  {
+    "expression": "x\\ or y",
+    "error": "Tag expression \"x\\ or y\" could not be parsed because of syntax error: Expected operator."
+  },
+  {
+    "expression": "a and",
+    "error": "Tag expression \"a and\" could not be parsed because of syntax error: Expected operand."
+  },
+  {
+    "expression": "a or",
+    "error": "Tag expression \"a or\" could not be parsed because of syntax error: Expected operand."
+  },
+  {
+    "expression": "not",
+    "error": "Tag expression \"not\" could not be parsed because of syntax error: Expected operand."
+  },
+  {
+    "expression": "a and not",
+    "error": "Tag expression \"a and not\" could not be parsed because of syntax error: Expected operand."
+  }
+]

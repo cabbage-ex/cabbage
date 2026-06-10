@@ -1,0 +1,1 @@
+{"expression":"{string","exception":"This Cucumber Expression has a problem at column 1:\n\n{string\n^\nThe '{' does not have a matching '}'.\nIf you did not intend to use a parameter you can use '\\{' to escape the a parameter"}
